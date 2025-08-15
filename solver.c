@@ -5,6 +5,12 @@
 
 const double DOUBLE_EPS = 1e-9;
 
+struct quadratic_coefficients {
+	double a;
+	double b;
+	double c;
+};
+
 /**
  * Calculates the solution for a quadratic equation.
  * Using formula D = b * b - 4 * a * c
@@ -12,14 +18,19 @@ const double DOUBLE_EPS = 1e-9;
  *
  * Returns the amount of roots found or -EINVAL in case of a validation error 
  */
-int solve_quadratic(double a, double b, double c, double roots[2]);
+int solve_quadratic(struct quadratic_coefficients coeffs, double roots[2]);
 
-int solve_quadratic(double a, double b, double c, double roots[2]) {
+int solve_quadratic(struct quadratic_coefficients coeffs, double roots[2]) {
 	double x1, x2;
+	double a, b, c;
 	double discriminant;
 	int roots_ct = 0;
 
 	errno = 0;
+
+	a = coeffs.a;
+	b = coeffs.b;
+	c = coeffs.c;
 
 	if (fabs(a) < DOUBLE_EPS) {
 		errno = EINVAL;
@@ -51,7 +62,7 @@ int solve_quadratic(double a, double b, double c, double roots[2]) {
 }
 
 int main() {
-	double a, b, c;
+	struct quadratic_coefficients coeffs;
 	double roots[2];
 	int roots_ct;
 	int ret;
@@ -60,7 +71,7 @@ int main() {
 	       	"separated with spaces so they form "
 		"a quadratic equation a*x^2 + b*x + c = 0 :\n");
 
-	ret = scanf("%lf%lf%lf", &a, &b, &c);
+	ret = scanf("%lf%lf%lf", &coeffs.a, &coeffs.b, &coeffs.c);
 
 	if (ret != 3) {
 		errno = EINVAL;
@@ -71,7 +82,7 @@ int main() {
 		return EXIT_FAILURE;
 	}
 
-	roots_ct = solve_quadratic(a, b, c, roots);
+	roots_ct = solve_quadratic(coeffs, roots);
 	if (roots_ct < 0) {
 		perror("Quadratic equation solving error");
 		return EXIT_FAILURE;
