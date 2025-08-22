@@ -1,91 +1,13 @@
 #include <stdio.h>
 #include <errno.h>
-#include <math.h>
 #include <stdlib.h>
-#include "solver.h"
+#include "equations.h"
 
-static const double DOUBLE_EPS = 1e-9;
-
-static inline int is_zero(double n) {
-	return fabs(n) < DOUBLE_EPS;
-}
-
-int solve_linear(double coeffs[2], double *root) {
-	double	k = coeffs[0],
-		b = coeffs[1];
-
-	if (is_zero(k)) {
-		if (is_zero(b)) {
-			return SQ_INF_ROOTS;
-		} else {
-			return 0; 
-		}
-	}
-
-	double x = (-b) / k;
-	*root = x;
-	return 1;
-}
-
-int solve_quadratic(double coeffs[3], double roots[2]) {
-	double x1 = 0, x2 = 0;
-	double	a = coeffs[0],
-		b = coeffs[1],
-		c = coeffs[2];
-
-	double discriminant = 0;
-	int roots_ct = 0;
-
-	if (is_zero(a)) {
-		return solve_linear(coeffs + 1, roots);
-	}
-	
-	discriminant = b * b - 4 * a * c;
-	if (discriminant < 0) {
-		return 0;
-	}
-
-	if (is_zero(discriminant)) {
-		roots_ct = 1;
-
-		x1 = -b / (2 * a);
-		x2 = x1;
-	} else {
-		roots_ct = 2;
-
-       		discriminant = sqrt(discriminant);
-		x1 = (-b - discriminant) / (2 * a);
-		x2 = (-b + discriminant) / (2 * a);
-	}
-	
-	roots[0] = x1;
-	roots[1] = x2;
-	return roots_ct;
-}
-
-int read_coefficients(double coeffs[], int len) {
-	int ret = 0;
-	int c = 0;
-
-	for (int i = 0; i < len; i++) {
-		ret = scanf("%lg", coeffs + i);
-		if (errno) {
-			perror("scanf() failed");
-			return -1;
-		}
-
-		if (ret != 1) {
-			return -1;
-		}
-
-		c = getchar();
-		if (c != ' ' && c != '\n') {
-			return -1;
-		}
-	}
-
-	return 0;
-}
+/**
+ * Reads n double coefficients from stdin.
+ * Ensures the coefficients are separated by spaces or new lines
+ */
+int read_coefficients(double coeffs[], int len);
 
 int main() {
 	double coeffs[3] = {0};
@@ -123,4 +45,32 @@ int main() {
 	printf("\n");
 	
 	return EXIT_SUCCESS;
+}
+
+int read_coefficients(double coeffs[], int len) {
+	int ret = 0;
+	int c = 0;
+
+	for (int i = 0; i < len; i++) {
+		ret = scanf("%lg", coeffs + i);
+		if (errno) {
+			perror("scanf() failed");
+			return -1;
+		}
+
+		if (ret != 1) {
+			return -1;
+		}
+
+		c = getchar();
+		if (c != ' ' && c != '\n') {
+			return -1;
+		}
+	}
+
+	if (c != '\n') {
+		return -1;
+	}
+
+	return 0;
 }
