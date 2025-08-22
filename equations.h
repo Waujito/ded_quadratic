@@ -26,7 +26,7 @@ int solve_linear(const double coeffs[LINEAR_COEFFICIENTS_LEN], double *root);
  * \f[ x_{1,2} = \frac{-b \pm \sqrt{D}}{2a} \f]
  * 
  * @param[in] coeffs Array of three coefficients \f$a\f$, \f$b\f$ and \f$c\f$
- * @param[out] roots Two-element array where the found roots will be stored.
+ * @param[out] roots Two-element array where the found roots will be stored. Real roots will be stored in ascending order
  * @return Number of real roots found, or SQ_INF_ROOTS if here are an infinite number of solutions. 
  * @note If \f$a\f$ is zero, although it is not a quadratic equation, the function will solve it as linear.
  */

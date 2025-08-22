@@ -44,10 +44,7 @@ int solve_quadratic(const double coeffs[QUADRATIC_COEFFICIENTS_LEN],
 		return solve_linear(coeffs + 1, roots);
 	}
 	
-	discriminant = b * b - 4 * a * c;
-	if (discriminant < 0) {
-		return 0;
-	}
+	discriminant = b * b - 4 * a * c;	
 
 	double x1 = 0, x2 = 0;
 
@@ -56,12 +53,21 @@ int solve_quadratic(const double coeffs[QUADRATIC_COEFFICIENTS_LEN],
 
 		x1 = -b / (2 * a);
 		x2 = x1;
+	} else if (discriminant < 0) {
+			return 0;
 	} else {
 		nRoots = 2;
 
        		discriminant = sqrt(discriminant);
 		x1 = (-b - discriminant) / (2 * a);
 		x2 = (-b + discriminant) / (2 * a);
+
+		// Return in ascending order
+		if (a < 0) {
+			double tmp = x1;
+			x1 = x2;
+			x2 = tmp;
+		}
 	}
 	
 	roots[0] = x1;
