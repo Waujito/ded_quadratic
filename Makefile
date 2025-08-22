@@ -13,4 +13,4 @@ solver: solver.o
 
 clean:
 	rm -f *.o
-	rm -f foo
+	rm -f solver
