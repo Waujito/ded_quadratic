@@ -1,5 +1,5 @@
-#ifndef SOLVER_H
-#define SOLVER_H
+#ifndef EQUATIONS_H
+#define EQUATIONS_H
 
 const static int SQ_INF_ROOTS = -1;
 
@@ -33,4 +33,4 @@ int solve_linear(const double coeffs[LINEAR_COEFFICIENTS_LEN], double *root);
 int solve_quadratic(const double coeffs[QUADRATIC_COEFFICIENTS_LEN], 
 		    double roots[MAX_QUADRATIC_ROOTS]);
 
-#endif /* SOLVER_H */
+#endif /* EQUATIONS_H */
