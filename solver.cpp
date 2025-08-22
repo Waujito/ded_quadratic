@@ -3,29 +3,16 @@
 #include <math.h>
 #include <stdlib.h>
 
-const double DOUBLE_EPS = 1e-9;
-const int SQ_INF_ROOTS = -1;
+/**
+ * Reads n double coefficients from stdin.
+ * Ensures the coefficients are separated by spaces or new lines
+ */
+int read_coefficients(double coeffs[], int len);
 
 /**
- * Coefficients for a quadratic equation a * x^2 + b * x + c
+ * Calculates the solution of a linear equation k * x + b = 0
  */
-struct quadratic_coefficients {
-	double a;
-	double b;
-	double c;
-};
-
-/**
- * Coefficients for a linear equation k * x + b
- */
-struct linear_coefficients {
-	double k;
-	double b;
-};
-
-static inline int is_zero(double n) {
-	return fabs(n) < DOUBLE_EPS;
-}
+int solve_linear(double coeffs[2], double *root);
 
 /**
  * Calculates the solution of a quadratic equation.
@@ -35,16 +22,18 @@ static inline int is_zero(double n) {
  * Returns the amount of roots found, 
  * or SQ_INF_ROOTS if the equation has infinity solutions
  */
-int solve_quadratic(struct quadratic_coefficients coeffs, double roots[2]);
+int solve_quadratic(double coeffs[3], double roots[2]);
 
-/**
- * Calculates the solution of a linear equation k * x + b = 0
- */
-int solve_linear(struct linear_coefficients coeffs, double *root);
+const double DOUBLE_EPS = 1e-9;
+const int SQ_INF_ROOTS = -1;
 
-int solve_linear(struct linear_coefficients coeffs, double *root) {
-	double	k = coeffs.k,
-		b = coeffs.b;
+static inline int is_zero(double n) {
+	return fabs(n) < DOUBLE_EPS;
+}
+
+int solve_linear(double coeffs[2], double *root) {
+	double	k = coeffs[0],
+		b = coeffs[1];
 
 	if (is_zero(k)) {
 		if (is_zero(b)) {
@@ -59,20 +48,17 @@ int solve_linear(struct linear_coefficients coeffs, double *root) {
 	return 1;
 }
 
-int solve_quadratic(struct quadratic_coefficients coeffs, double roots[2]) {
+int solve_quadratic(double coeffs[3], double roots[2]) {
 	double x1 = 0, x2 = 0;
-	double	a = coeffs.a, 
-		b = coeffs.b, 
-		c = coeffs.c;
+	double	a = coeffs[0],
+		b = coeffs[1],
+		c = coeffs[2];
 
 	double discriminant = 0;
 	int roots_ct = 0;
 
 	if (is_zero(a)) {
-		return solve_linear(
-			(struct linear_coefficients) { .k = b, .b = c },
-			roots
-		);
+		return solve_linear(coeffs + 1, roots);
 	}
 	
 	discriminant = b * b - 4 * a * c;
@@ -98,8 +84,32 @@ int solve_quadratic(struct quadratic_coefficients coeffs, double roots[2]) {
 	return roots_ct;
 }
 
+int read_coefficients(double coeffs[], int len) {
+	int ret = 0;
+	char c = 0;
+
+	for (int i = 0; i < len; i++) {
+		ret = scanf("%lg", coeffs + i);
+		if (errno) {
+			perror("scanf() failed");
+			return -1;
+		}
+
+		if (ret != 1) {
+			return -1;
+		}
+
+		c = getchar();
+		if (c != ' ' && c != '\n') {
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
 int main() {
-	struct quadratic_coefficients coeffs = {0};
+	double coeffs[3] = {0};
 	double roots[2] = {0};
 	int nRoots = 0;
 	int ret = 0;
@@ -108,14 +118,9 @@ int main() {
 	       	"separated with spaces so they form "
 		"a quadratic equation a*x^2 + b*x + c = 0 :\n");
 
-	ret = scanf("%lf%lf%lf", &coeffs.a, &coeffs.b, &coeffs.c);
+	ret = read_coefficients(coeffs, 3);
 
-	if (errno) {
-		perror("scanf() failed");
-		return EXIT_FAILURE;
-	}
-
-	if (ret != 3) {
+	if (ret) {
 		fprintf(stderr, "RTFM\n");
 		return EXIT_FAILURE;
 	}
