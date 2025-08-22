@@ -2,30 +2,9 @@
 #include <errno.h>
 #include <math.h>
 #include <stdlib.h>
+#include "solver.h"
 
-/**
- * Reads n double coefficients from stdin.
- * Ensures the coefficients are separated by spaces or new lines
- */
-int read_coefficients(double coeffs[], int len);
-
-/**
- * Calculates the solution of a linear equation k * x + b = 0
- */
-int solve_linear(double coeffs[2], double *root);
-
-/**
- * Calculates the solution of a quadratic equation.
- * Uses formula D = b * b - 4 * a * c
- * x1,2 = (-b +- sqrt(D)) / (2 * a)
- *
- * Returns the amount of roots found, 
- * or SQ_INF_ROOTS if the equation has infinity solutions
- */
-int solve_quadratic(double coeffs[3], double roots[2]);
-
-const double DOUBLE_EPS = 1e-9;
-const int SQ_INF_ROOTS = -1;
+static const double DOUBLE_EPS = 1e-9;
 
 static inline int is_zero(double n) {
 	return fabs(n) < DOUBLE_EPS;
@@ -86,7 +65,7 @@ int solve_quadratic(double coeffs[3], double roots[2]) {
 
 int read_coefficients(double coeffs[], int len) {
 	int ret = 0;
-	char c = 0;
+	int c = 0;
 
 	for (int i = 0; i < len; i++) {
 		ret = scanf("%lg", coeffs + i);
@@ -117,6 +96,7 @@ int main() {
 	printf(	"Write coefficients a, b, c "
 	       	"separated with spaces so they form "
 		"a quadratic equation a*x^2 + b*x + c = 0 :\n");
+
 
 	ret = read_coefficients(coeffs, 3);
 

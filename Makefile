@@ -2,6 +2,10 @@ CFLAGS = -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-loo
 LDFLAGS = $(CFLAGS)
 CC = g++
 
+CPPSRC = solver.cpp
+CPPOBJ = $(CPPSRC:%.cpp=%.o)
+CPPD = $(CPPSRC:%.cpp=%.d)
+
 .PHONY: build clean
 
 build: solver
@@ -9,8 +13,15 @@ build: solver
 run: build
 	./solver
 
-solver: solver.o
+$(CPPOBJ): %.o: %.cpp
+	$(CXX) $(CFLAGS) -MP -MMD -c $< -o $@
+
+solver: $(CPPOBJ)
+	$(CXX) $(CFLAGS) $(CPPOBJ) -o solver
 
 clean:
 	rm -f *.o
+	rm -f *.d
 	rm -f solver
+
+-include $(CPPD)
