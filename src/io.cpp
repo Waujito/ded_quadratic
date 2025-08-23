@@ -1,3 +1,9 @@
+/**
+ * @file
+ *
+ * @brief IO functions for polynom coefficients
+ */
+
 #include "io.h"
 #include <assert.h>
 #include <stdlib.h>

@@ -1,7 +1,7 @@
 /**
  * @file
  *
- * @brief Declaration of equation solvers
+ * @brief Declarations of equation solvers
  */
 
 #ifndef EQUATIONS_H

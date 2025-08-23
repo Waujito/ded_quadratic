@@ -1,7 +1,7 @@
 /**
  * @file
  *
- * @brief Declaration of IO functions for polynom coefficients
+ * @brief Declarations of IO functions for polynom coefficients
  */
 
 #ifndef EQ_IO_H
