@@ -1,11 +1,50 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "argparse.h"
 #include "io.h"
 #include "equation_solvers.h"
 
-int main() {
+/*
+
+	   |\---/|
+	   | ,_, |
+	    \_`_/-..----.
+	 ___/ `   ' ,""+ \  
+	(__...'   __\    |`.___.';
+	  (_,...'(_,.`__)/'.....+
+
+*/
+
+enum {
+	OPT_HELP
+};
+
+static struct option opts[] = {
+	{ "help",	NO_ARGUMENT,	OPT_HELP	},
+	{ 0,		0,		0		},
+};
+
+
+int arg_callback(struct args_context ctx) {
+	printf("Option %s ", ctx.opt.name);
+	if (ctx.value) {
+		printf("with value %s", ctx.value);
+	}
+	printf("\n");
+
+	return 0;
+}
+
+int main(int argc, char **argv) {
 	struct polynom pol = (struct polynom){0};
 	int ret = 0;
+
+	ret = parse_args(argc, argv, opts, arg_callback, NULL);
+	if (ret) {
+		printf("What the error ^_^ %d\n", ret);
+		return EXIT_FAILURE;
+	}
+	printf("\n");
 
 	printf(	"Write coefficients a, b, c "
 	       	"separated with spaces so they form "
