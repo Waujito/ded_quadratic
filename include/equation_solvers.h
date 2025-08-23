@@ -26,14 +26,36 @@ struct polynom_roots {
 };
 
 /**
+ * @brief An enumeration of all possible return values for equation solvers
+ */
+enum solving_status {
+	SOLVING_SUCCESS		= 0,
+	SOLVING_ERROR		= -1,
+	SOLVING_NOT_IMPLEMENTED	= -2
+};
+
+/**
+ *
+ * @brief Attempts to find roots of a polynomial equation.
+ *
+ * Currently implemented root finders up to quadratic equation.
+ *
+ * @param [in] pol A polynom of \p nCoeffs coefficients 
+ * @param [out] roots A pointer to polynom_roots being filled. nRoots is the number of roots found, or SQ_INF_ROOTS if the equation has infinitely many solutions
+ *
+ * @return enum solving_status
+ */
+enum solving_status solve_polynomial(struct polynom pol, struct polynom_roots *roots);
+
+/**
  * @brief Solves the linear equation \f$kx + b = 0\f$.
  *
  * @param [in] pol A polynom of two coefficients \f$k\f$ and \f$b\f$
  * @param [out] roots A pointer to polynom_roots being filled. nRoots is the number of roots found, or SQ_INF_ROOTS if the equation has infinitely many solutions
  *
- * @return 0 on successful operation, -1 in case of an error
+ * @return enum solving_status
  */
-int solve_linear(struct polynom pol, struct polynom_roots *roots);
+enum solving_status solve_linear(struct polynom pol, struct polynom_roots *roots);
 
 /**
  * @brief Solves a quadratic equation \f$ ax^2 + bx + c = 0 \f$.
@@ -47,10 +69,10 @@ int solve_linear(struct polynom pol, struct polynom_roots *roots);
  * @param [in] pol A polynom of three coefficients \f$a\f$, \f$b\f$ and \f$c\f$
  * @param [out] roots A pointer to polynom_roots being filled. nRoots is the number of roots found, or SQ_INF_ROOTS if the equation has infinitely many solutions
  *
- * @return 0 on successful operation, -1 in case of an error
+ * @return enum solving_status
  *
  * @note If \f$a\f$ is zero, although it is not a quadratic equation, the function will solve it as linear.
  */
-int solve_quadratic(struct polynom pol, struct polynom_roots *roots);
+enum solving_status solve_quadratic(struct polynom pol, struct polynom_roots *roots);
 
 #endif /* EQUATIONS_H */

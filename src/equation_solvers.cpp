@@ -14,7 +14,34 @@ inline int is_zero(double n) {
 	return fabs(n) < DOUBLE_EPS;
 }
 
-int solve_linear(struct polynom pol, struct polynom_roots *roots) {
+enum solving_status solve_polynomial(struct polynom pol, struct polynom_roots *roots) {
+	assert (roots != NULL);
+	assert (pol.nCoeffs >= 0 && pol.nCoeffs <= MAX_COEFFICIENTS);
+
+	if (pol.nCoeffs == 0) {
+		roots->nRoots = SQ_INF_ROOTS;
+		return SOLVING_SUCCESS;
+	}
+
+	switch (pol.nCoeffs) {
+		case 0:
+			roots->nRoots = SQ_INF_ROOTS;
+			return SOLVING_SUCCESS;
+		case 1:
+			roots->nRoots = (is_zero(pol.coeffs[0]) ? SQ_INF_ROOTS : 0);
+			return SOLVING_SUCCESS;
+		case 2:
+			return solve_linear(pol, roots);
+		case 3:
+			return solve_quadratic(pol, roots);
+		default:
+			return SOLVING_NOT_IMPLEMENTED;
+	}
+
+	return SOLVING_ERROR;
+}
+
+enum solving_status solve_linear(struct polynom pol, struct polynom_roots *roots) {
 	assert (roots		!= NULL);
 	assert (pol.nCoeffs	== 2);
 
@@ -28,7 +55,7 @@ int solve_linear(struct polynom pol, struct polynom_roots *roots) {
 			roots->nRoots = 0;
 		}
 
-		return 0; 
+		return SOLVING_SUCCESS; 
 	}
 
 	double x = (-b) / k;
@@ -36,10 +63,10 @@ int solve_linear(struct polynom pol, struct polynom_roots *roots) {
 	roots->nRoots = 1;
 	roots->roots[0] = x;
 
-	return 0;
+	return SOLVING_SUCCESS;
 }
 
-int solve_quadratic(struct polynom pol, struct polynom_roots *roots) {
+enum solving_status solve_quadratic(struct polynom pol, struct polynom_roots *roots) {
 	assert (roots		!= NULL);
 	assert (pol.nCoeffs	== 3);
 
@@ -87,5 +114,6 @@ int solve_quadratic(struct polynom pol, struct polynom_roots *roots) {
 	roots->roots[0] = x1;
 	roots->roots[1] = x2;
 
-	return 0;
+	return SOLVING_SUCCESS;
 }
+

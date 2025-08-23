@@ -20,9 +20,10 @@ int main() {
 	}
 
 	struct polynom_roots roots;
-	ret = solve_quadratic(pol, &roots);	
+	ret = solve_polynomial(pol, &roots);	
 	if (ret) {
-		fprintf(stderr, "Something went wrong while solving an equation, exiting\n");
+		fprintf(stderr, "Something went wrong while solving an equation: "
+				"A solver exited with exit code %d\n", ret);
 		return EXIT_FAILURE;
 	}
 
