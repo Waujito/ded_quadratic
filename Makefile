@@ -12,7 +12,7 @@ APP = solver
 MAIN_FN_OBJ = src/solver.o
 TEST_APP = test_solver
 
-.PHONY: build clean run test document
+.PHONY: build clean run test document build_test
 
 build: $(APP)
 
@@ -28,7 +28,9 @@ $(APP): $(CPPOBJ)
 $(TEST_APP): $(APP) $(TESTOBJ)
 	$(CXX) $(CFLAGS) $(LDFLAGS) $(filter-out $(MAIN_FN_OBJ),$(CPPOBJ)) $(TESTOBJ) -lgtest_main -lgtest -o $(TEST_APP) 
 
-test: $(TEST_APP) 
+build_test: $(TEST_APP)
+
+test: build_test
 	./$(TEST_APP)
 
 document: 

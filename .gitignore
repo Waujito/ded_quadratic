@@ -6,3 +6,4 @@ test_solver
 compile_commands.json
 .*
 !.gitignore
+!.github
