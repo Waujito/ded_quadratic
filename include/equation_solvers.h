@@ -16,8 +16,8 @@ const static int MAX_COEFFICIENTS = 10;
 const static int MAX_ROOTS = 10;
 
 struct polynom {
+	int nCoeffs;
 	double coeffs[MAX_COEFFICIENTS];
-	int nCoeffs;	
 };
 
 struct polynom_roots {

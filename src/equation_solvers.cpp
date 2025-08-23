@@ -51,8 +51,8 @@ int solve_quadratic(struct polynom pol, struct polynom_roots *roots) {
 
 	if (is_zero(a)) {
 		struct polynom linear_pol = {
+			.nCoeffs = 2,
 			.coeffs = { pol.coeffs[1], pol.coeffs[2] },
-			.nCoeffs = 2
 		};
 
 		return solve_linear(linear_pol, roots);
