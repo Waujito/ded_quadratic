@@ -1,26 +1,32 @@
-#include "equations.h"
+#include "equation_solvers.h"
 #include <math.h>
 #include <gtest/gtest.h>
 
 void assertion_check(double a, double b, double c, int nRoots, double x1, double x2);
 
 void assertion_check(double a, double b, double c, int nRoots, double x1, double x2) {
-	double coeffs[QUADRATIC_COEFFICIENTS_LEN] = {a, b, c};
-	double roots[MAX_QUADRATIC_ROOTS] = {0};
+	struct polynom pol = {
+		.coeffs = { a, b, c },
+		.nCoeffs = 3,
+	};
+	struct polynom_roots roots;
 
-	int nRoots_t = solve_quadratic(coeffs, roots);	
+	int ret = solve_quadratic(pol, &roots);
 
-	ASSERT_EQ(nRoots, nRoots_t);
-	if (nRoots >= 1) {
-		ASSERT_DOUBLE_EQ(roots[0], x1);
+	ASSERT_EQ(ret, 0);
+
+	ASSERT_EQ(roots.nRoots, nRoots);
+	if (roots.nRoots >= 1) {
+		ASSERT_DOUBLE_EQ(roots.roots[0], x1);
 	}
-	if (nRoots >= 2) {
-		ASSERT_DOUBLE_EQ(roots[1], x2);
+	if (roots.nRoots >= 2) {
+		ASSERT_DOUBLE_EQ(roots.roots[1], x2);
 	}
 }
 
 
-TEST(EqTest, TwoRealRoots) {
+TEST(EqTest, TwoRealRoots)
+{
 	assertion_check(1, -5, 6, 2, 2, 3);
 }
 

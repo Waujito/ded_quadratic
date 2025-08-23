@@ -7,7 +7,7 @@ export CXX CFLAGS
 
 BUILD_DIR := build
 
-LIBSRC := src/equations.cpp
+LIBSRC := src/equation_solvers.cpp src/io.cpp
 LIBOBJ := $(LIBSRC:%.cpp=$(BUILD_DIR)/%.o)
 STATIC_LIB := $(BUILD_DIR)/equations.a
 
@@ -15,7 +15,7 @@ TESTSRC := test/equations.cpp
 TESTOBJ := $(TESTSRC:%.cpp=$(BUILD_DIR)/%.o)
 TEST_LIB_APP := $(BUILD_DIR)/test_equations
 
-CPPSRC := src/solver.cpp
+CPPSRC := src/main_fn.cpp
 CPPOBJ := $(CPPSRC:%.cpp=$(BUILD_DIR)/%.o)
 CPPD := $(CPPSRC:%.cpp=$(BUILD_DIR)/%.d)
 APP := $(BUILD_DIR)/solver
@@ -37,7 +37,7 @@ $(CPPOBJ) $(TESTOBJ) $(LIBOBJ): $(BUILD_DIR)/%.o: %.cpp $(OBJDIRS)
 	$(CXX) $(CFLAGS) -I./ -MP -MMD -c $< -o $@
 
 $(STATIC_LIB): $(LIBOBJ)
-	ar rvs $@ $<
+	ar rvs $@ $^
 
 $(TEST_LIB_APP): $(STATIC_LIB) $(TESTOBJ)
 	$(CXX) $(CFLAGS) $(LDFLAGS) $(TESTOBJ) $(STATIC_LIB) -lgtest_main -lgtest -o $(TEST_LIB_APP) 
