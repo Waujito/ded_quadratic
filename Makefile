@@ -5,28 +5,35 @@ export CXX CFLAGS
 
 # -flto-odr-type-merging
 
+BUILD_DIR := build
+
 LIBSRC := src/equations.cpp
-LIBOBJ := $(LIBSRC:%.cpp=%.o)
-STATIC_LIB := equations.a
+LIBOBJ := $(LIBSRC:%.cpp=$(BUILD_DIR)/%.o)
+STATIC_LIB := $(BUILD_DIR)/equations.a
 
 TESTSRC := test/equations.cpp
-TESTOBJ := $(TESTSRC:%.cpp=%.o)
+TESTOBJ := $(TESTSRC:%.cpp=$(BUILD_DIR)/%.o)
+TEST_LIB_APP := $(BUILD_DIR)/test_equations
 
 CPPSRC := src/solver.cpp
-CPPOBJ := $(CPPSRC:%.cpp=%.o)
-CPPD := $(CPPSRC:%.cpp=%.d)
+CPPOBJ := $(CPPSRC:%.cpp=$(BUILD_DIR)/%.o)
+CPPD := $(CPPSRC:%.cpp=$(BUILD_DIR)/%.d)
+APP := $(BUILD_DIR)/solver
 
-APP := solver
-TEST_LIB_APP := test_equations
+OBJDIRS := $(sort $(dir $(LIBOBJ) $(TESTOBJ) $(CPPOBJ)))
 
-.PHONY: build clean run test document build_test
+.PHONY: build clean run test document build_test objdirs
 
 build: $(APP)
 
 run: build
 	./$(APP)
 
-$(CPPOBJ) $(TESTOBJ) $(LIBOBJ): %.o: %.cpp
+$(OBJDIRS):
+	mkdir -p $(OBJDIRS)
+
+$(CPPOBJ) $(TESTOBJ) $(LIBOBJ): $(BUILD_DIR)/%.o: %.cpp $(OBJDIRS)
+	# $< takes only the FIRST dependency
 	$(CXX) $(CFLAGS) -I./ -MP -MMD -c $< -o $@
 
 $(STATIC_LIB): $(LIBOBJ)
@@ -44,12 +51,10 @@ test: build_test
 $(APP): $(CPPOBJ) $(STATIC_LIB)
 	$(CXX) $(CFLAGS) $(LDFLAGS) $(CPPOBJ) $(STATIC_LIB) -o $(APP)
 
-document: 
+document: objdirs
 	doxygen doxygen.conf
 
 clean:
-	rm -f *.o *.d *.a ./**/*.o ./**/*.d ./**/*.a
-	rm -f $(APP) $(TEST_LIB_APP) $(STATIC_LIB)
-	rm -rf doxygen
+	rm -rf build
 
 -include $(CPPD)
