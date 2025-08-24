@@ -11,7 +11,7 @@ LIBSRC := src/equation_solvers.cpp src/io.cpp src/argparse.cpp
 LIBOBJ := $(LIBSRC:%.cpp=$(BUILD_DIR)/%.o)
 STATIC_LIB := $(BUILD_DIR)/equations.a
 
-TESTSRC := test/equations.cpp
+TESTSRC := test/equations.cpp test/test_machine.cpp
 TESTOBJ := $(TESTSRC:%.cpp=$(BUILD_DIR)/%.o)
 TEST_LIB_APP := $(BUILD_DIR)/test_equations
 
@@ -39,8 +39,10 @@ $(CPPOBJ) $(TESTOBJ) $(LIBOBJ): $(BUILD_DIR)/%.o: %.cpp $(OBJDIRS)
 $(STATIC_LIB): $(LIBOBJ)
 	ar rvs $@ $^
 
+#-lgtest_main -lgtest
+
 $(TEST_LIB_APP): $(STATIC_LIB) $(TESTOBJ)
-	$(CXX) $(CFLAGS) $(LDFLAGS) $(TESTOBJ) $(STATIC_LIB) -lgtest_main -lgtest -o $(TEST_LIB_APP) 
+	$(CXX) $(CFLAGS) $(LDFLAGS) $(TESTOBJ) $(STATIC_LIB) -o $(TEST_LIB_APP)
 
 
 build_test: $(TEST_LIB_APP)
