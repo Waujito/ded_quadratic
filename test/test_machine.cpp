@@ -16,6 +16,41 @@ struct test_unit *tests	= NULL;
 size_t tests_capacity	= 0;
 size_t tests_len	= 0;
 
+int tests_add_entry(struct test_unit test);
+int test_runner(struct test_unit test);
+
+int main() {
+	int ret = 0;
+
+	__TM_PRINT_DEBUG("In main() \n");
+
+	int passed_tests = 0;
+	int failed_tests = 0;
+
+	for (size_t i = 0; i < tests_len; i++) {
+		struct test_unit test_unit = tests[i];
+		ret = test_runner(test_unit);
+
+		if (ret == 0) {
+			passed_tests++;
+		} else if (ret == 1) {
+			failed_tests++;
+		} else {
+			printf("Internal error\n");
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	printf("\n");
+	printf("passed tests: %d; failed tests: %d\n", passed_tests, failed_tests);
+
+	if (failed_tests != 0) {
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
 int tests_add_entry(struct test_unit test) {
 	__TM_PRINT_DEBUG("cap %zu len %zu\n", tests_capacity, tests_len);
 	if (tests_len >= tests_capacity) {
@@ -99,37 +134,4 @@ int test_runner(struct test_unit test) {
 	__TM_PRINT_DEBUG("Test finished\n\n");
 
 	return failed;
-}
-
-
-int main() {
-	int ret = 0;
-
-	__TM_PRINT_DEBUG("In main() \n");
-
-	int passed_tests = 0;
-	int failed_tests = 0;
-
-	for (size_t i = 0; i < tests_len; i++) {
-		struct test_unit test_unit = tests[i];
-		ret = test_runner(test_unit);
-
-		if (ret == 0) {
-			passed_tests++;
-		} else if (ret == 1) {
-			failed_tests++;
-		} else {
-			printf("Internal error\n");
-			exit(EXIT_FAILURE);
-		}
-	}
-
-	printf("\n");
-	printf("passed tests: %d; failed tests: %d\n", passed_tests, failed_tests);
-
-	if (failed_tests != 0) {
-		return EXIT_FAILURE;
-	}
-
-	return EXIT_SUCCESS;
 }

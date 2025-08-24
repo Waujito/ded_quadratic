@@ -89,7 +89,7 @@ static void __tm__##test_group##_##test_name##_constructor() {	\
 	__TM_TEST_CONSTRUCTOR(test_group, test_name);		\
 	__TM_TEST_FN(test_group, test_name)			\
 
-void __tm_assert_fail_exit(void);
+void __tm_assert_fail_exit(void) __attribute__ ((__noreturn__));
 
 #define STRINGIZING(x) #x
 #define STR(x) STRINGIZING(x)
@@ -108,34 +108,40 @@ inline int __tm_is_eq_double(double pred, double target) {
 	return __tm_is_zero(pred - target);
 }
 
-/*
- * This is more like C-style, but relies purely on defines
- *
- * #define __TM_ASSERTION_FAILURE_OPEN(file_line)	\
- * 	printf(COLOR_RED);				\
- * 	printf(	"In %s \n", file_line);			\
- * 	printf(	"Assertion failed: \n");		\
- * 
- * #define __TM_ASSERTION_FAILURE_CLOSE			\
- * 	printf(COLOR_CLEAR)				\
- * 
- * 
- * #define __TM_EQUAL_ASSERTION(a, b, assert_func, printf_specifier)	\
- * 	if (!assert_func(a, b)) {					\
- * 		__TM_ASSERTION_FAILURE_OPEN(FILE_LINE)			\
- * 		printf(	"\tExpected:\t" printf_specifier "\n"		\
- * 			"\tFound:\t\t" printf_specifier "\n",		\
- * 			a, b						\
- * 		);							\
- * 		__TM_ASSERTION_FAILURE_CLOSE;				\
- * 		__tm_assert_fail_exit();				\
- * 									\
- * 	}			
+static const char __tm_int_fmt[] = "%d";
+static const char __tm_double_fmt[] = "%lg";
+
+/**
+ * Here is two ways to logging. 
+ * One is pure C-style defines and another is C++ templates
  */
 
-template<typename T>
+#ifdef __TM_ASSERT_LOGGING_DEFINES
+#define __TM_ASSERTION_FAILURE_OPEN(file_line)		\
+	printf(COLOR_RED);				\
+	printf(	"In %s \n", file_line);			\
+	printf(	"Assertion failed: \n");		\
+
+#define __TM_ASSERTION_FAILURE_CLOSE			\
+	printf(COLOR_CLEAR)				\
+
+
+#define __TM_EQUAL_ASSERTION(pred, target, assert_func, printf_specifier)	\
+	if (!assert_func(pred, target)) {					\
+		__TM_ASSERTION_FAILURE_OPEN(__TM_FILE_LINE);			\
+		printf(	"\tExpected:\t%s := ", #target);			\
+		printf(printf_specifier, target);				\
+		printf("\n");							\
+		printf("\tFound:\t\t%s := ", #pred);				\
+		printf(printf_specifier, pred);					\
+		printf("\n");							\
+		__TM_ASSERTION_FAILURE_CLOSE;					\
+		__tm_assert_fail_exit();					\
+	}			
+#else /* __TM_ASSERT_LOGGING_DEFINES */
+template<const char *fmt_dg, typename T>
 static void __tm_assert_fail_log(T pred, T target, 
-				 const char *file_line, const char *fmt_dg,
+				 const char *file_line,
 				 const char *pred_name, const char *target_name) {
 	printf("\n");
 	printf(COLOR_RED);
@@ -156,16 +162,17 @@ static void __tm_assert_fail_log(T pred, T target,
 
 #define __TM_EQUAL_ASSERTION(pred, target, assert_func, printf_specifier)	\
 	if (!assert_func(pred, target)) {					\
-		__tm_assert_fail_log(pred, target, __TM_FILE_LINE,		\
-			printf_specifier, #pred, #target);			\
+		__tm_assert_fail_log<printf_specifier>(pred, target, 		\
+		__TM_FILE_LINE,	#pred, #target);				\
 		__tm_assert_fail_exit();					\
 	}
+#endif /* __TM_ASSERT_LOGGING_DEFINES */
 
 #define ASSERT_EQ(pred, target) 	\
-	__TM_EQUAL_ASSERTION(pred, target, __tm_is_eq_int, 	"%d");
+	__TM_EQUAL_ASSERTION(pred, target, __tm_is_eq_int, 	__tm_int_fmt);
 
 #define ASSERT_DOUBLE_EQ(pred, target)	\
-	__TM_EQUAL_ASSERTION(pred, target, __tm_is_eq_double, 	"%lg");
+	__TM_EQUAL_ASSERTION(pred, target, __tm_is_eq_double, 	__tm_double_fmt);
 
 
 /*

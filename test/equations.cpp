@@ -34,9 +34,9 @@ void quadratic_test(double a, double b, double c, int nRoots, double x1, double 
 }
 
 
-TEST(EqTest, NormalEquation)		{ quadratic_test(1, -5, 6, 2, 2, 4); }
+TEST(EqTest, NormalEquation)		{ quadratic_test(1, -5, 6, 2, 2, 3); }
 
-TEST(EqTest, NegativeCoefficients)	{ quadratic_test(2, 3, -2, 1, -2, 0.5); }
+TEST(EqTest, NegativeCoefficients)	{ quadratic_test(2, 3, -2, 2, -2, 0.5); }
 
 TEST(EqTest, DoubleRoot)		{ quadratic_test(1, -6, 9, 1, 3, NAN);	}
 
