@@ -25,6 +25,8 @@ static struct option opts[] = {
 };
 
 
+int arg_callback(struct args_context ctx);
+
 int arg_callback(struct args_context ctx) {
 	printf("Option %s ", ctx.opt.name);
 	if (ctx.value) {

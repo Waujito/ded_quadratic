@@ -7,11 +7,36 @@
 #include "equation_solvers.h"
 #include <assert.h>
 #include <math.h>
+#include <stdint.h>
+#include <stdio.h>
 
 static const double DOUBLE_EPS = 1e-9;
 
 inline int is_zero(double n) {
 	return fabs(n) < DOUBLE_EPS;
+}
+
+static int vectorized_swap(char *p1, char *p2, size_t sz) {
+	size_t processed_sz = 0;
+
+	while (processed_sz + sizeof(uint64_t) <= sz) {
+		uint64_t dt1 = *(uint64_t *)p1;
+		*(uint64_t *)p1 = *(uint64_t *)p2;
+		*(uint64_t *)p2 = dt1;
+		processed_sz += sizeof(uint64_t);
+		p1 += sizeof(uint64_t);
+		p2 += sizeof(uint64_t);
+	}
+
+	while (processed_sz + sizeof(char) <= sz) {
+		char dt1 = *p1;
+		*p1 = *p2;
+		*p2 = dt1;
+		processed_sz++;
+		p1++, p2++;
+	}
+
+	return 0;
 }
 
 enum solving_status solve_polynomial(struct polynom pol, struct polynom_roots *roots) {
@@ -104,10 +129,8 @@ enum solving_status solve_quadratic(struct polynom pol, struct polynom_roots *ro
 		x2 = (-b + discriminant) / (2 * a);
 
 		// Return in ascending order
-		if (a < 0) { // TODO vectorized swap
-			double tmp = x1;
-			x1 = x2;
-			x2 = tmp;
+		if (a < 0) {
+			vectorized_swap((char *)&x1, (char *)&x2, sizeof(x1));
 		}
 	}
 	
