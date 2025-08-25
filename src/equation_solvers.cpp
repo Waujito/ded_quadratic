@@ -19,7 +19,7 @@ static inline int is_zero(double n) {
 
 static int vectorized_swap(char *p1, char *p2, size_t sz) {
 	size_t processed_sz = 0;
-
+// TODO switch
 	while (processed_sz + sizeof(uint64_t) <= sz) {
 		uint64_t dt1 = *(uint64_t *)p1;
 		*(uint64_t *)p1 = *(uint64_t *)p2;

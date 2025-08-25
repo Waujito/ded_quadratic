@@ -122,8 +122,7 @@ static const char __tm_double_fmt[]	= "%lg";
 
 #ifdef __TM_ASSERT_LOGGING_DEFINES
 #define __TM_ASSERTION_FAILURE_OPEN(file_line)		\
-	eprintf(COLOR_RED);				\
-	eprintf("In %s \n", file_line);			\
+	eprintf(COLOR_RED "In %s \n", file_line);			\
 	eprintf("Assertion failed: \n");		\
 
 #define __TM_ASSERTION_FAILURE_CLOSE			\

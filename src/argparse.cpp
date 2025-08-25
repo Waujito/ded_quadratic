@@ -3,11 +3,19 @@
  *
  * @brief argparse machine
  */
+#include <assert.h>
+
 #include "argparse.h"
+
+
+//split to functions
 
 int parse_args(int argc, char **argv, 
 	       struct option opts[],
 	       args_callback callback, void *context) {
+	assert(argv);
+	assert(opts);
+	assert(callback);
 
 	for (int argi = 1; argi < argc; argi++) {
 		const char *arg_name = argv[argi];
@@ -15,9 +23,9 @@ int parse_args(int argc, char **argv,
 		const char *value = 0; 
 		
 		for (int opti = 0; opts[opti].name; opti++) {
-			struct option opt = opts[opti];
+			struct option opt = opts[opti]; // TODO empty name
 			const char *optname = opt.name;
-			const char *argn_cp = arg_name;
+			const char *argn_cp = arg_name; // FIXME rename
 
 			// read dashes
 			int nDashes = 0;
@@ -33,7 +41,6 @@ int parse_args(int argc, char **argv,
 			if (	(nDashes == 1 && cmp_len != 1) || 
 				nDashes != 2)
 				return -argi;
-			
 
 			if (*argn_cp == '=') {
 				value = ++argn_cp;

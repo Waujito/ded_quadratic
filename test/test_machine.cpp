@@ -43,8 +43,8 @@ int main() {
 		}
 	}
 
-	printf("\n");
-	printf("passed tests: %d; failed tests: %d\n", passed_tests, failed_tests);
+	printf(	"\n"
+		"passed tests: %d; failed tests: %d\n", passed_tests, failed_tests);
 
 	if (failed_tests != 0) {
 		return EXIT_FAILURE;
@@ -58,7 +58,7 @@ int tests_add_entry(struct test_unit *test) {
 	if (tests_vector.tests_len >= tests_vector.tests_capacity) {
 		size_t new_capacity = tests_vector.tests_capacity * 2;
 		if (new_capacity == 0) {
-			new_capacity = 4;
+			new_capacity = 4; // TODO const
 		}
 
 		struct test_unit *ntests = (struct test_unit *) realloc(
@@ -99,7 +99,7 @@ test_fn_t __tm_add_test(test_fn_t test,
 	return test;
 }
 
-static jmp_buf __tm_jmp_point;
+static jmp_buf __tm_jmp_point = {0};
 
 void __tm_assert_fail_exit(void) {
 	longjmp(__tm_jmp_point, 1);
@@ -122,7 +122,7 @@ int test_runner(struct test_unit *test) {
 	// If longjmp was not called, the program will omit failed = 1
 
 	// TODO: wrap with defines
-	if (failed) {
+	if (failed) { // TODO time
 		eprintf(COLOR_RED
 			"[%s.%s][FAIL]"
 			COLOR_CLEAR
