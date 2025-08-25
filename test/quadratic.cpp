@@ -46,50 +46,88 @@ void quadratic_test(struct quadratic_coeffs coeffs, struct quadratic_roots roots
 }
 
 
-TEST(EqTest, NormalEquation) { 
-	quadratic_test( { .a = 1, .b = -5, .c = 6 }, { .nRoots = 2, .x1 = 2, .x2 = 3 } ); 
+TEST(EqTest, NormalEquation) {
+	quadratic_test(
+		(struct quadratic_coeffs) { .a = 1, .b = -5, .c = 6 },
+		(struct quadratic_roots) { .nRoots = 2, .x1 = 2, .x2 = 3 }
+	);
 }
 
 TEST(EqTest, NegativeCoefficients) {
-	quadratic_test( { .a = 2, .b = 3, .c = -2 }, { .nRoots = 2, .x1 = -2, .x2 = 0.5 } );
+	quadratic_test(
+		(struct quadratic_coeffs) { .a = 2, .b = 3, .c = -2 },
+		(struct quadratic_roots) { .nRoots = 2, .x1 = -2, .x2 = 0.5 }
+	);
 }
 
 TEST(EqTest, DoubleRoot) {
-	quadratic_test( { .a = 1, .b = -6, .c = 9 }, { .nRoots = 1, .x1 = 3, .x2 = NAN } );
+	quadratic_test(
+		(struct quadratic_coeffs) { .a = 1, .b = -6, .c = 9 },
+		(struct quadratic_roots) { .nRoots = 1, .x1 = 3, .x2 = NAN }
+	);
 }
 
 TEST(EqTest, NoRationalSolutions) {
-	quadratic_test( { .a = 1, .b = 4, .c = 5 }, { .nRoots = 0, .x1 = NAN, .x2 = NAN } );
+	quadratic_test(
+		(struct quadratic_coeffs) { .a = 1, .b = 4, .c = 5 },
+		(struct quadratic_roots) { .nRoots = 0, .x1 = NAN, .x2 = NAN }
+	);
 }
 
 TEST(EqTest, Zero_b) { 
-	quadratic_test( { .a = 1, .b = 0, .c = -9 }, { .nRoots = 2, .x1 = -3, .x2 = 3 } );
+	quadratic_test(
+		(struct quadratic_coeffs) { .a = 1, .b = 0, .c = -9 },
+		(struct quadratic_roots) { .nRoots = 2, .x1 = -3, .x2 = 3 }
+	);
 }
 
 TEST(EqTest, Zero_c) {
-	quadratic_test( { .a = 1, .b = 5, .c = 0 }, { .nRoots = 2, .x1 = -5, .x2 = 0 } );
+	quadratic_test(
+		(struct quadratic_coeffs) { .a = 1, .b = 5, .c = 0 },
+		(struct quadratic_roots) { .nRoots = 2, .x1 = -5, .x2 = 0 }
+	);
 }
 
 TEST(EqTest, Zero_bc) {
-	quadratic_test( { .a = 4, .b = 0, .c = 0 }, { .nRoots = 1, .x1 = 0, .x2 = NAN } );
+	quadratic_test(
+		(struct quadratic_coeffs) { .a = 4, .b = 0, .c = 0 },
+		(struct quadratic_roots) { .nRoots = 1, .x1 = 0, .x2 = NAN }
+	);
 }
 
 TEST(EqTest, Large_coeffs) {
-	quadratic_test( { .a = 1e6, .b = -4e6, .c = 3e6 }, { .nRoots = 2, .x1 = 1, .x2 = 3 } );
+	quadratic_test(
+		(struct quadratic_coeffs) { .a = 1e6, .b = -4e6, .c = 3e6 },
+		(struct quadratic_roots) { .nRoots = 2, .x1 = 1, .x2 = 3 }
+	);
 }
 
 TEST(EqTest, Negative_a) {
-	quadratic_test( { .a = -1, .b = 1, .c = 2 }, { .nRoots = 2, .x1 = -1, .x2 = 2 } );
+	quadratic_test(
+		(struct quadratic_coeffs) { .a = -1, .b = 1, .c = 2 },
+		(struct quadratic_roots) { .nRoots = 2, .x1 = -1, .x2 = 2 }
+	);
 }
 
 TEST(EqTest, Linear_eq) {
-	quadratic_test( { .a = 0, .b = 2, .c = -4 }, { .nRoots = 1, .x1 = 2, .x2 = NAN } );
+	quadratic_test(
+		(struct quadratic_coeffs) { .a = 0, .b = 2, .c = -4 },
+		(struct quadratic_roots) { .nRoots = 1, .x1 = 2, .x2 = NAN }
+	);
 }
 
 TEST(EqTest, Linear_no_solution) {
-	quadratic_test( { .a = 0, .b = 0, .c = 7 }, { .nRoots = 0, .x1 = NAN, .x2 = NAN } );
+	quadratic_test(
+		(struct quadratic_coeffs) { .a = 0, .b = 0, .c = 7 },
+		(struct quadratic_roots) { .nRoots = 0, .x1 = NAN, .x2 = NAN }
+	);
 }
 
 TEST(EqTest, Linear_infinity_solutions) {
-	quadratic_test( { .a = 0, .b = 0, .c = 0 }, { .nRoots = SQ_INF_ROOTS, .x1 = NAN, .x2 = NAN } );
+	quadratic_test(
+		(struct quadratic_coeffs) { .a = 0, .b = 0, .c = 0 },
+		(struct quadratic_roots) { 
+			.nRoots = SQ_INF_ROOTS, .x1 = NAN, .x2 = NAN
+		}
+	);
 }

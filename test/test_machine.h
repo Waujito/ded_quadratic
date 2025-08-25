@@ -87,16 +87,18 @@ void __tm_assert_fail_exit(void) __attribute__ ((__noreturn__));
 #define STR(x) STRINGIZING(x)
 #define __TM_FILE_LINE __FILE__ ":" STR(__LINE__)
 
-static const double __TM_DOUBLE_EPS = 1e-9;
+// static const double __TM_DOUBLE_EPS = 1e-9;
+#define __TM_DOUBLE_EPS (1e-9)
 
-inline int __tm_is_zero(double n) {
+static inline int __tm_is_zero(double n) {
 	return fabs(n) < __TM_DOUBLE_EPS;
 }
 
-inline int __tm_is_eq_int(int pred, int target) {
+static inline int __tm_is_eq_int(int pred, int target) {
 	return pred == target;
 }
-inline int __tm_is_eq_double(double pred, double target) {
+
+static inline int __tm_is_eq_double(double pred, double target) {
 	return __tm_is_zero(pred - target);
 }
 
@@ -111,6 +113,10 @@ static const char __tm_double_fmt[]	= "%lg";
  * Here is two ways to logging.
  * One is pure C-style defines and another is C++ templates
  */
+
+#ifndef __cplusplus
+#define __TM_ASSERT_LOGGING_DEFINES
+#endif
 
 #ifdef __TM_ASSERT_LOGGING_DEFINES
 #define __TM_ASSERTION_FAILURE_OPEN(file_line)		\

@@ -10,9 +10,10 @@
 #include <stdint.h>
 #include <stdio.h>
 
-static const double DOUBLE_EPS = 1e-9;
+// static const double DOUBLE_EPS = 1e-9;
+#define DOUBLE_EPS (1e-9)
 
-inline int is_zero(double n) {
+static inline int is_zero(double n) {
 	return fabs(n) < DOUBLE_EPS;
 }
 

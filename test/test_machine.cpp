@@ -13,10 +13,10 @@ struct test_unit {
 };
 
 struct tests_vector {
-	struct test_unit *tests	= NULL;
-	size_t tests_capacity	= 0;
-	size_t tests_len	= 0;
-} tests_vector;
+	struct test_unit *tests;
+	size_t tests_capacity;
+	size_t tests_len;
+} tests_vector = {0};
 
 int tests_add_entry(struct test_unit *test);
 int test_runner(struct test_unit *test);
@@ -63,7 +63,7 @@ int tests_add_entry(struct test_unit *test) {
 
 		struct test_unit *ntests = (struct test_unit *) realloc(
 			tests_vector.tests,
-			new_capacity * sizeof(test_unit)
+			new_capacity * sizeof(struct test_unit)
 		);
 
 		if (!ntests) {
