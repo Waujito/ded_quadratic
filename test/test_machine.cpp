@@ -12,12 +12,14 @@ struct test_unit {
 	int line;
 };
 
-struct test_unit *tests	= NULL;
-size_t tests_capacity	= 0;
-size_t tests_len	= 0;
+struct tests_vector {
+	struct test_unit *tests	= NULL;
+	size_t tests_capacity	= 0;
+	size_t tests_len	= 0;
+} tests_vector;
 
 int tests_add_entry(struct test_unit test);
-int test_runner(struct test_unit test);
+int test_runner(struct test_unit *test);
 
 int main() {
 	int ret = 0;
@@ -27,8 +29,8 @@ int main() {
 	int passed_tests = 0;
 	int failed_tests = 0;
 
-	for (size_t i = 0; i < tests_len; i++) {
-		struct test_unit test_unit = tests[i];
+	for (size_t i = 0; i < tests_vector.tests_len; i++) {
+		struct test_unit *test_unit = &tests_vector.tests[i];
 		ret = test_runner(test_unit);
 
 		if (ret == 0) {
@@ -51,30 +53,33 @@ int main() {
 	return EXIT_SUCCESS;
 }
 
-int tests_add_entry(struct test_unit test) {
+int tests_add_entry(struct test_unit *test) {
 	__TM_PRINT_DEBUG("cap %zu len %zu\n", tests_capacity, tests_len);
-	if (tests_len >= tests_capacity) {
-		size_t new_capacity = tests_capacity * 2;
+	if (tests_vector.tests_len >= tests_vector.tests_capacity) {
+		size_t new_capacity = tests_vector.tests_capacity * 2;
 		if (new_capacity == 0) {
 			new_capacity = 4;
 		}
 
-		struct test_unit *ntests = (struct test_unit *)realloc(tests, 
-				      new_capacity * sizeof(test_unit));
+		struct test_unit *ntests = (struct test_unit *) realloc(
+			tests_vector.tests,
+			new_capacity * sizeof(test_unit)
+		);
+
 		if (!ntests) {
 			return -1;
 		}
 
-		tests = ntests;
-		tests_capacity = new_capacity;
+		tests_vector.tests = ntests;
+		tests_vector.tests_capacity = new_capacity;
 	}
 
-	tests[tests_len++] = test;
+	tests_vector.tests[tests_vector.tests_len++] = *test;
 
 	return 0;
 }
 
-test_fn_t __tm_add_test(test_fn_t test, 
+test_fn_t __tm_add_test(test_fn_t test,
 			const char *fname, int line,
 			const char *test_group, const char *test_name) {
 	struct test_unit test_unit = {
@@ -85,11 +90,11 @@ test_fn_t __tm_add_test(test_fn_t test,
 		.line		= line
 	};
 
-	int ret = tests_add_entry(test_unit);
+	int ret = tests_add_entry(&test_unit);
 	if (ret) {
 		exit(EXIT_FAILURE);
 	}
-		
+
 	__TM_PRINT_DEBUG("Adding test from file %s and line %d\n", fname, line);
 	return test;
 }
@@ -100,34 +105,35 @@ void __tm_assert_fail_exit(void) {
 	longjmp(__tm_jmp_point, 1);
 }
 
-int test_runner(struct test_unit test) {
+int test_runner(struct test_unit *test) {
 	__TM_PRINT_DEBUG(
-		"Running test %s.%s with function ptr=%p from file %s on line %d\n", 
+		"Running test %s.%s with function ptr=%p from file %s on line %d\n",
 		test.test_group, test.test_name,
 		test.fun_ptr, test.fname, test.line);
 
 	int failed = 0;
-	
+
 	if (!setjmp(__tm_jmp_point)) {
-		test.fun_ptr();
+		test->fun_ptr();
 	} else {
 		// If longjmp was called, the program will jump here
 		failed = 1;
 	}
 	// If longjmp was not called, the program will omit failed = 1
 
+	// TODO: wrap with defines
 	if (failed) {
 		printf(	COLOR_RED
 			"[%s.%s][FAIL]"
-			COLOR_CLEAR 
+			COLOR_CLEAR
 			"\n\n",
-			test.test_group, test.test_name
+			test->test_group, test->test_name
 		);
 	} else {
 		printf(	COLOR_GREEN
 			"[%s.%s][PASS]"
 			COLOR_CLEAR "\n",
-			test.test_group, test.test_name
+			test->test_group, test->test_name
 		);
 	}
 
