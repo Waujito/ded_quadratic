@@ -10,49 +10,86 @@
 
 #endif /* USE_GTEST */
 
-void quadratic_test(double a, double b, double c, int nRoots, double x1, double x2);
+struct quadratic_coeffs {
+	double a;
+	double b;
+	double c;
+};
 
-void quadratic_test(double a, double b, double c, int nRoots, double x1, double x2) {
+struct quadratic_roots {
+	int nRoots;
+	double x1;
+	double x2;
+};
+
+void quadratic_test(struct quadratic_coeffs coeffs, struct quadratic_roots roots);
+
+void quadratic_test(struct quadratic_coeffs coeffs, struct quadratic_roots roots) {
 	struct polynom pol = {
 		.nCoeffs = 3,
-		.coeffs = { a, b, c },
+		.coeffs = { coeffs.a, coeffs.b, coeffs.c },
 	};
-	struct polynom_roots roots = {0};
+	struct polynom_roots ret_roots = {0};
 
-	int ret = solve_quadratic(pol, &roots);
+	int ret = solve_quadratic(pol, &ret_roots);
 
 	ASSERT_EQ(ret, 0);
 
-	ASSERT_EQ(roots.nRoots, nRoots);
+	ASSERT_EQ(ret_roots.nRoots, roots.nRoots);
+
 	if (roots.nRoots >= 1) {
-		ASSERT_DOUBLE_EQ(roots.roots[0], x1);
+		ASSERT_DOUBLE_EQ(ret_roots.roots[0], roots.x1);
 	}
 	if (roots.nRoots >= 2) {
-		ASSERT_DOUBLE_EQ(roots.roots[1], x2);
+		ASSERT_DOUBLE_EQ(ret_roots.roots[1], roots.x2);
 	}
 }
 
 
-TEST(EqTest, NormalEquation)		{ quadratic_test(1, -5, 6, 2, 2, 3); }
+TEST(EqTest, NormalEquation) { 
+	quadratic_test( { .a = 1, .b = -5, .c = 6 }, { .nRoots = 2, .x1 = 2, .x2 = 3 } ); 
+}
 
-TEST(EqTest, NegativeCoefficients)	{ quadratic_test(2, 3, -2, 2, -2, 0.5); }
+TEST(EqTest, NegativeCoefficients) {
+	quadratic_test( { .a = 2, .b = 3, .c = -2 }, { .nRoots = 2, .x1 = -2, .x2 = 0.5 } );
+}
 
-TEST(EqTest, DoubleRoot)		{ quadratic_test(1, -6, 9, 1, 3, NAN);	}
+TEST(EqTest, DoubleRoot) {
+	quadratic_test( { .a = 1, .b = -6, .c = 9 }, { .nRoots = 1, .x1 = 3, .x2 = NAN } );
+}
 
-TEST(EqTest, NoRationalSolutions)	{ quadratic_test(1, 4, 5, 0, NAN, NAN); }
+TEST(EqTest, NoRationalSolutions) {
+	quadratic_test( { .a = 1, .b = 4, .c = 5 }, { .nRoots = 0, .x1 = NAN, .x2 = NAN } );
+}
 
-TEST(EqTest, Zero_b)			{ quadratic_test(1, 0, -9, 2, -3, 3); }
+TEST(EqTest, Zero_b) { 
+	quadratic_test( { .a = 1, .b = 0, .c = -9 }, { .nRoots = 2, .x1 = -3, .x2 = 3 } );
+}
 
-TEST(EqTest, Zero_c)			{ quadratic_test(1, 5, 0, 2, -5, 0); }
+TEST(EqTest, Zero_c) {
+	quadratic_test( { .a = 1, .b = 5, .c = 0 }, { .nRoots = 2, .x1 = -5, .x2 = 0 } );
+}
 
-TEST(EqTest, Zero_bc)			{ quadratic_test(4, 0, 0, 1, 0, NAN); }
+TEST(EqTest, Zero_bc) {
+	quadratic_test( { .a = 4, .b = 0, .c = 0 }, { .nRoots = 1, .x1 = 0, .x2 = NAN } );
+}
 
-TEST(EqTest, Large_coeffs)		{ quadratic_test(1e6, -4e6, 3e6, 2, 1, 3); }
+TEST(EqTest, Large_coeffs) {
+	quadratic_test( { .a = 1e6, .b = -4e6, .c = 3e6 }, { .nRoots = 2, .x1 = 1, .x2 = 3 } );
+}
 
-TEST(EqTest, Negative_a)		{ quadratic_test(-1, 1, 2, 2, -1, 2); }
+TEST(EqTest, Negative_a) {
+	quadratic_test( { .a = -1, .b = 1, .c = 2 }, { .nRoots = 2, .x1 = -1, .x2 = 2 } );
+}
 
-TEST(EqTest, Linear_eq)			{ quadratic_test(0, 2, -4, 1, 2, NAN); }
+TEST(EqTest, Linear_eq) {
+	quadratic_test( { .a = 0, .b = 2, .c = -4 }, { .nRoots = 1, .x1 = 2, .x2 = NAN } );
+}
 
-TEST(EqTest, Linear_no_solution)	{ quadratic_test(0, 0, 7, 0, NAN, NAN); }
+TEST(EqTest, Linear_no_solution) {
+	quadratic_test( { .a = 0, .b = 0, .c = 7 }, { .nRoots = 0, .x1 = NAN, .x2 = NAN } );
+}
 
-TEST(EqTest, Linear_infinity_solutions)	{ quadratic_test(0, 0, 0, SQ_INF_ROOTS, NAN, NAN); }
+TEST(EqTest, Linear_infinity_solutions) {
+	quadratic_test( { .a = 0, .b = 0, .c = 0 }, { .nRoots = SQ_INF_ROOTS, .x1 = NAN, .x2 = NAN } );
+}
