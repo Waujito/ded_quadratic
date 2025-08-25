@@ -11,29 +11,29 @@
 #include <stdio.h>
 #include "colors.h"
 
-#ifdef __TM_TEST_DEBUG
-#define __TM_PRINT_DEBUG(...) printf(__VA_ARGS__)
-#else /* __TM_TEST_DEBUG */
-#define __TM_PRINT_DEBUG(...) (void)0
-#endif /* __TM_TEST_DEBUG */
+#ifdef TM_T_TEST_DEBUG
+#define TM_T_PRINT_DEBUG(...) printf(__VA_ARGS__)
+#else /* TM_T_TEST_DEBUG */
+#define TM_T_PRINT_DEBUG(...) (void)0
+#endif /* TM_T_TEST_DEBUG */
 
 #define eprintf(...) fprintf(stderr, __VA_ARGS__)
 
 typedef void (*test_fn_t)(void);
 
-#define __TM_TEST_FN_NAME(test_group, test_name)		\
-	__tm_##test_group_##test_name##_fn			\
+#define TM_T_TEST_FN_NAME(test_group, test_name)		\
+	tm_t_##test_group_##test_name##_fn			\
 
-#define __TM_TEST_FN(test_group, test_name)			\
-	void __TM_TEST_FN_NAME(test_group, test_name)(void)	\
+#define TM_T_TEST_FN(test_group, test_name)			\
+	void TM_T_TEST_FN_NAME(test_group, test_name)(void)	\
 
-#define __TM_TEST_DUMMY(test_group, test_name)			\
-	const test_fn_t __tm__##test_group##_##test_name##_dummy
+#define TM_T_TEST_DUMMY(test_group, test_name)			\
+	const test_fn_t tm_t__##test_group##_##test_name##_dummy
 
 /**
  * @brief Registers the test within the global test tracker
  */
-test_fn_t __tm_add_test(test_fn_t test,
+test_fn_t tm_t_add_test(test_fn_t test,
 			const char *fname, int line,
 			const char *test_group, const char *test_name);
 
@@ -48,19 +48,19 @@ test_fn_t __tm_add_test(test_fn_t test,
  *   Such initialization in C++ calls the function before main().
  */
 #if __has_attribute(constructor)
-#define __TM_TEST_CONSTRUCTOR(test_group, test_name)		\
+#define TM_T_TEST_CONSTRUCTOR(test_group, test_name)		\
 __attribute__((constructor))					\
-static void __tm__##test_group##_##test_name##_constructor() {	\
-	__tm_add_test(						\
-		__TM_TEST_FN_NAME(test_group, test_name),	\
+static void tm_t__##test_group##_##test_name##_constructor() {	\
+	tm_t_add_test(						\
+		TM_T_TEST_FN_NAME(test_group, test_name),	\
 		__FILE__, __LINE__,				\
 		#test_group, #test_name				\
 	);							\
 }
 #else /* __has_attribute(constructor) */
-#define __TM_TEST_CONSTRUCTOR(test_group, test_name)		\
-	__TM_TEST_DUMMY(test_group, test_name) = __tm_add_test(	\
-		__TM_TEST_FN_NAME(test_group, test_name),	\
+#define TM_T_TEST_CONSTRUCTOR(test_group, test_name)		\
+	TM_T_TEST_DUMMY(test_group, test_name) = tm_t_add_test(	\
+		TM_T_TEST_FN_NAME(test_group, test_name),	\
 		__FILE__, __LINE__,				\
 		#test_group, #test_name				\
 	);
@@ -79,37 +79,37 @@ static void __tm__##test_group##_##test_name##_constructor() {	\
  * @endcode
  */
 #define TEST(test_group, test_name)				\
-	__TM_TEST_FN(test_group, test_name);			\
-	__TM_TEST_CONSTRUCTOR(test_group, test_name);		\
-	__TM_TEST_FN(test_group, test_name)			\
+	TM_T_TEST_FN(test_group, test_name);			\
+	TM_T_TEST_CONSTRUCTOR(test_group, test_name);		\
+	TM_T_TEST_FN(test_group, test_name)			\
 
-void __tm_assert_fail_exit(void) __attribute__ ((__noreturn__));
+void tm_t_assert_fail_exit(void) __attribute__ ((__noreturn__));
 
 #define STRINGIZING(x) #x
 #define STR(x) STRINGIZING(x)
-#define __TM_FILE_LINE __FILE__ ":" STR(__LINE__)
+#define TM_T_FILE_LINE __FILE__ ":" STR(__LINE__)
 
-// static const double __TM_DOUBLE_EPS = 1e-9;
-#define __TM_DOUBLE_EPS (1e-9)
+// static const double TM_T_DOUBLE_EPS = 1e-9;
+#define TM_T_DOUBLE_EPS (1e-9)
 
-static inline int __tm_is_zero(double n) {
-	return fabs(n) < __TM_DOUBLE_EPS;
+static inline int tm_t_is_zero(double n) {
+	return fabs(n) < TM_T_DOUBLE_EPS;
 }
 
-static inline int __tm_is_eq_int(int pred, int target) {
+static inline int tm_t_is_eq_int(int pred, int target) {
 	return pred == target;
 }
 
-static inline int __tm_is_eq_double(double pred, double target) {
-	return __tm_is_zero(pred - target);
+static inline int tm_t_is_eq_double(double pred, double target) {
+	return tm_t_is_zero(pred - target);
 }
 
 /**
  * Pass type qualifiers here
  */
 
-static const char __tm_int_fmt[]	= "%d";
-static const char __tm_double_fmt[]	= "%lg";
+static const char tm_t_int_fmt[]	= "%d";
+static const char tm_t_double_fmt[]	= "%lg";
 
 /**
  * Here is two ways to logging.
@@ -117,30 +117,30 @@ static const char __tm_double_fmt[]	= "%lg";
  */
 
 #ifndef __cplusplus
-#define __TM_ASSERT_LOGGING_DEFINES
+#define TM_T_ASSERT_LOGGING_DEFINES
 #endif
 
-#ifdef __TM_ASSERT_LOGGING_DEFINES
-#define __TM_ASSERTION_FAILURE_OPEN(file_line)		\
+#ifdef TM_T_ASSERT_LOGGING_DEFINES
+#define TM_T_ASSERTION_FAILURE_OPEN(file_line)		\
 	eprintf(COLOR_RED "In %s \n", file_line);			\
 	eprintf("Assertion failed: \n");		\
 
-#define __TM_ASSERTION_FAILURE_CLOSE			\
+#define TM_T_ASSERTION_FAILURE_CLOSE			\
 	eprintf(COLOR_CLEAR)				\
 
-#define __TM_EQUAL_ASSERTION(pred, target, assert_func, printf_specifier)	\
+#define TM_T_EQUAL_ASSERTION(pred, target, assert_func, printf_specifier)	\
 	if (!assert_func(pred, target)) {					\
-		__TM_ASSERTION_FAILURE_OPEN(__TM_FILE_LINE);			\
+		TM_T_ASSERTION_FAILURE_OPEN(TM_T_FILE_LINE);			\
 		eprintf("\tExpected:\t%s := ", #target);			\
 		eprintf(printf_specifier, target);				\
 		eprintf("\n");							\
 		eprintf("\tFound:\t\t%s := ", #pred);				\
 		eprintf(printf_specifier, pred);				\
 		eprintf("\n");							\
-		__TM_ASSERTION_FAILURE_CLOSE;					\
-		__tm_assert_fail_exit();					\
+		TM_T_ASSERTION_FAILURE_CLOSE;					\
+		tm_t_assert_fail_exit();					\
 	}
-#else /* __TM_ASSERT_LOGGING_DEFINES */
+#else /* TM_T_ASSERT_LOGGING_DEFINES */
 
 template <typename T>
 struct TypeToPrintfSpec {
@@ -149,16 +149,16 @@ struct TypeToPrintfSpec {
 
 template <>
 struct TypeToPrintfSpec<int> {
-	static constexpr const char *value = __tm_int_fmt;
+	static constexpr const char *value = tm_t_int_fmt;
 };
 
 template <>
 struct TypeToPrintfSpec<double> {
-	static constexpr const char *value = __tm_double_fmt;
+	static constexpr const char *value = tm_t_double_fmt;
 };
 
 template<typename T>
-static void __tm_assert_fail_log(T pred, T target,
+static void tm_t_assert_fail_log(T pred, T target,
 				 const char *file_line,
 				 const char *pred_name, const char *target_name) {
 
@@ -182,19 +182,19 @@ static void __tm_assert_fail_log(T pred, T target,
 	eprintf(COLOR_CLEAR);
 }
 
-#define __TM_EQUAL_ASSERTION(pred, target, assert_func, printf_specifier)	\
+#define TM_T_EQUAL_ASSERTION(pred, target, assert_func, printf_specifier)	\
 	if (!assert_func(pred, target)) {					\
-		__tm_assert_fail_log(pred, target,				\
-					__TM_FILE_LINE,	#pred, #target);	\
-		__tm_assert_fail_exit();					\
+		tm_t_assert_fail_log(pred, target,				\
+					TM_T_FILE_LINE,	#pred, #target);	\
+		tm_t_assert_fail_exit();					\
 	}
-#endif /* __TM_ASSERT_LOGGING_DEFINES */
+#endif /* TM_T_ASSERT_LOGGING_DEFINES */
 
 #define ASSERT_EQ(pred, target) 	\
-	__TM_EQUAL_ASSERTION(pred, target, __tm_is_eq_int, 	__tm_int_fmt);
+	TM_T_EQUAL_ASSERTION(pred, target, tm_t_is_eq_int, 	tm_t_int_fmt);
 
 #define ASSERT_DOUBLE_EQ(pred, target)	\
-	__TM_EQUAL_ASSERTION(pred, target, __tm_is_eq_double, 	__tm_double_fmt);
+	TM_T_EQUAL_ASSERTION(pred, target, tm_t_is_eq_double, 	tm_t_double_fmt);
 
 
 /*

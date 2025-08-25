@@ -22,7 +22,7 @@ struct tests_vector {
 } tests_vector = {0};
 
 static int tests_add_entry(struct test_unit *test) {
-	__TM_PRINT_DEBUG("cap %zu len %zu\n", tests_capacity, tests_len);
+	TM_T_PRINT_DEBUG("cap %zu len %zu\n", tests_capacity, tests_len);
 	if (tests_vector.tests_len >= tests_vector.tests_capacity) {
 		size_t new_capacity = tests_vector.tests_capacity * 2;
 		if (new_capacity == 0) {
@@ -47,7 +47,7 @@ static int tests_add_entry(struct test_unit *test) {
 	return 0;
 }
 
-test_fn_t __tm_add_test(test_fn_t test,
+test_fn_t tm_t_add_test(test_fn_t test,
 			const char *fname, int line,
 			const char *test_group, const char *test_name) {
 	struct test_unit test_unit = {
@@ -63,14 +63,14 @@ test_fn_t __tm_add_test(test_fn_t test,
 		exit(EXIT_FAILURE);
 	}
 
-	__TM_PRINT_DEBUG("Adding test from file %s and line %d\n", fname, line);
+	TM_T_PRINT_DEBUG("Adding test from file %s and line %d\n", fname, line);
 	return test;
 }
 
-static jmp_buf __tm_jmp_point = {0};
+static jmp_buf tm_t_jmp_point = {0};
 
-void __tm_assert_fail_exit(void) {
-	longjmp(__tm_jmp_point, 1);
+void tm_t_assert_fail_exit(void) {
+	longjmp(tm_t_jmp_point, 1);
 }
 
 static double millis_diff (struct timespec end_time, struct timespec start_time) {
@@ -82,7 +82,7 @@ static double millis_diff (struct timespec end_time, struct timespec start_time)
 }
 
 static int test_runner(struct test_unit *test) {
-	__TM_PRINT_DEBUG(
+	TM_T_PRINT_DEBUG(
 		"Running test %s.%s with function ptr=%p from file %s on line %d\n",
 		test.test_group, test.test_name,
 		test.fun_ptr, test.fname, test.line);
@@ -92,7 +92,7 @@ static int test_runner(struct test_unit *test) {
 	struct timespec start_time = {0};
 	if (!timespec_get(&start_time, TIME_UTC)) return -1;
 
-	if (!setjmp(__tm_jmp_point)) {
+	if (!setjmp(tm_t_jmp_point)) {
 		test->fun_ptr();
 	} else {
 		// If longjmp was called, the program will jump here
@@ -116,7 +116,7 @@ static int test_runner(struct test_unit *test) {
 		fprintf(stdout, "\n");
 	}
 
-	__TM_PRINT_DEBUG("Test finished\n\n");
+	TM_T_PRINT_DEBUG("Test finished\n\n");
 
 	return failed;
 }
@@ -124,7 +124,7 @@ static int test_runner(struct test_unit *test) {
 int main() {
 	int ret = 0;
 
-	__TM_PRINT_DEBUG("In main() \n");
+	TM_T_PRINT_DEBUG("In main() \n");
 
 	int passed_tests = 0;
 	int failed_tests = 0;
