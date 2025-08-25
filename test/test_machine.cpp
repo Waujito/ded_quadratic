@@ -38,7 +38,7 @@ int main() {
 		} else if (ret == 1) {
 			failed_tests++;
 		} else {
-			printf("Internal error\n");
+			eprintf("Internal error\n");
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -123,7 +123,7 @@ int test_runner(struct test_unit *test) {
 
 	// TODO: wrap with defines
 	if (failed) {
-		printf(	COLOR_RED
+		eprintf(COLOR_RED
 			"[%s.%s][FAIL]"
 			COLOR_CLEAR
 			"\n\n",

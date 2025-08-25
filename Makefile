@@ -38,7 +38,8 @@ CPPSRC := src/main_fn.cpp
 CPPOBJ := $(CPPSRC:%.cpp=$(BUILD_DIR)/%.o)
 APP := $(BUILD_DIR)/solver
 
-incpd := $($(CPPSRC) $(TESTSRC) $(LIBSRC) $(TESTLIBSRC):%.cpp=$(BUILD_DIR)/%.d)
+INCPDSRC := $(CPPSRC) $(TESTSRC) $(LIBSRC) $(TESTLIBSRC)
+incpd := $(INCPDSRC:%.cpp=$(BUILD_DIR)/%.d)
 
 OBJDIRS := $(sort $(dir $(LIBOBJ) $(TESTOBJ) $(CPPOBJ) $(TESTLIBOBJ)))
 

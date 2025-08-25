@@ -17,6 +17,8 @@
 #define __TM_PRINT_DEBUG(...) (void)0
 #endif /* __TM_TEST_DEBUG */
 
+#define eprintf(...) fprintf(stderr, __VA_ARGS__)
+
 typedef void (*test_fn_t)(void);
 
 #define __TM_TEST_FN_NAME(test_group, test_name)		\
@@ -120,23 +122,22 @@ static const char __tm_double_fmt[]	= "%lg";
 
 #ifdef __TM_ASSERT_LOGGING_DEFINES
 #define __TM_ASSERTION_FAILURE_OPEN(file_line)		\
-	printf(COLOR_RED);				\
-	printf("In %s \n", file_line);			\
-	printf("Assertion failed: \n");			\
+	eprintf(COLOR_RED);				\
+	eprintf("In %s \n", file_line);			\
+	eprintf("Assertion failed: \n");		\
 
 #define __TM_ASSERTION_FAILURE_CLOSE			\
-	printf(COLOR_CLEAR)				\
+	eprintf(COLOR_CLEAR)				\
 
-// TODO: stderr
 #define __TM_EQUAL_ASSERTION(pred, target, assert_func, printf_specifier)	\
 	if (!assert_func(pred, target)) {					\
 		__TM_ASSERTION_FAILURE_OPEN(__TM_FILE_LINE);			\
-		printf("\tExpected:\t%s := ", #target);				\
-		printf(printf_specifier, target);				\
-		printf("\n");							\
-		printf("\tFound:\t\t%s := ", #pred);				\
-		printf(printf_specifier, pred);					\
-		printf("\n");							\
+		eprintf("\tExpected:\t%s := ", #target);			\
+		eprintf(printf_specifier, target);				\
+		eprintf("\n");							\
+		eprintf("\tFound:\t\t%s := ", #pred);				\
+		eprintf(printf_specifier, pred);				\
+		eprintf("\n");							\
 		__TM_ASSERTION_FAILURE_CLOSE;					\
 		__tm_assert_fail_exit();					\
 	}
@@ -165,21 +166,21 @@ static void __tm_assert_fail_log(T pred, T target,
 	static_assert(	TypeToPrintfSpec<T>::value != NULL,
 			"No valid logging function for type");
 
-	printf("\n");
-	printf(COLOR_RED);
+	eprintf("\n");
+	eprintf(COLOR_RED);
 
-	printf("In %s \n", file_line);
-	printf("Assertion failed: \n");
+	eprintf("In %s \n", file_line);
+	eprintf("Assertion failed: \n");
 
-	printf("\tExpected:\t%s := ", target_name);
-	printf(TypeToPrintfSpec<T>::value, target);
-	printf("\n");
+	eprintf("\tExpected:\t%s := ", target_name);
+	eprintf(TypeToPrintfSpec<T>::value, target);
+	eprintf("\n");
 
-	printf("\tFound:\t\t%s := ", pred_name);
-	printf(TypeToPrintfSpec<T>::value, pred);
-	printf("\n");
+	eprintf("\tFound:\t\t%s := ", pred_name);
+	eprintf(TypeToPrintfSpec<T>::value, pred);
+	eprintf("\n");
 
-	printf(COLOR_CLEAR);
+	eprintf(COLOR_CLEAR);
 }
 
 #define __TM_EQUAL_ASSERTION(pred, target, assert_func, printf_specifier)	\

@@ -45,7 +45,6 @@ void quadratic_test(struct quadratic_coeffs coeffs, struct quadratic_roots roots
 	}
 }
 
-
 TEST(EqTest, NormalEquation) {
 	quadratic_test(
 		(struct quadratic_coeffs) { .a = 1, .b = -5, .c = 6 },
