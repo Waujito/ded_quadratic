@@ -18,7 +18,7 @@ STATIC_LIB := $(BUILD_DIR)/equations.a
 TESTLIBSRC := test/test_machine.cpp
 TESTLIBOBJ := $(TESTLIBSRC:%.cpp=$(BUILD_DIR)/%.o)
 
-TESTSRC := test/equations.cpp
+TESTSRC := test/quadratic.cpp test/polynomial.cpp
 TESTOBJ := $(TESTSRC:%.cpp=$(BUILD_DIR)/%.o)
 TEST_LIB_APP := $(BUILD_DIR)/test_equations
 

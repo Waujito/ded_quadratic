@@ -7,13 +7,13 @@
 #ifndef EQUATIONS_H
 #define EQUATIONS_H
 
-const static int SQ_INF_ROOTS = -1;
+static const int SQ_INF_ROOTS = -1;
 
-const static int LINEAR_COEFFICIENTS_LEN = 2;
-const static int QUADRATIC_COEFFICIENTS_LEN = 3;
+static const int LINEAR_COEFFICIENTS_LEN = 2;
+static const int QUADRATIC_COEFFICIENTS_LEN = 3;
 
-const static int MAX_COEFFICIENTS = 10;
-const static int MAX_ROOTS = 10;
+static const int MAX_COEFFICIENTS = 10;
+static const int MAX_ROOTS = 10;
 
 struct polynom {
 	int nCoeffs;

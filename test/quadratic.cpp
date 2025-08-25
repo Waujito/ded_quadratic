@@ -1,5 +1,4 @@
 #include "equation_solvers.h"
-#include <math.h>
 
 #ifdef USE_GTEST
 
@@ -18,7 +17,7 @@ void quadratic_test(double a, double b, double c, int nRoots, double x1, double 
 		.nCoeffs = 3,
 		.coeffs = { a, b, c },
 	};
-	struct polynom_roots roots;
+	struct polynom_roots roots = {0};
 
 	int ret = solve_quadratic(pol, &roots);
 
