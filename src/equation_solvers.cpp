@@ -17,16 +17,45 @@ static inline int is_zero(double n) {
 	return fabs(n) < DOUBLE_EPS;
 }
 
+static const uint64_t DOUBLE_NAN_SPEC = 0x7ff0LL << 48;
+
+int is_finite(double n) {
+	uint64_t d = 0;
+
+	static_assert (sizeof(d) == sizeof(n), "sizeof d and n");
+
+	memcpy(&d, &n, sizeof(n));
+
+	if ((d & DOUBLE_NAN_SPEC) == DOUBLE_NAN_SPEC) {
+		return 0;
+	}
+
+	return 1;
+}
+
+static inline int is_polynom_finite(struct polynom *pol) {
+	assert (pol);
+	assert (pol->nCoeffs < MAX_COEFFICIENTS);
+
+	for (int i = 0; i < pol->nCoeffs; i++) {
+		if (!is_finite(pol->coeffs[i]))
+			return 0;
+	}
+
+	return 1;
+}
+
 static int vectorized_swap(char *p1, char *p2, size_t sz) {
 	size_t processed_sz = 0;
 // TODO switch
 	while (processed_sz + sizeof(uint64_t) <= sz) {
-		uint64_t dt1 = *(uint64_t *)p1;
-		*(uint64_t *)p1 = *(uint64_t *)p2;
-		*(uint64_t *)p2 = dt1;
-		processed_sz += sizeof(uint64_t);
-		p1 += sizeof(uint64_t);
-		p2 += sizeof(uint64_t);
+		uint64_t dt1 = 0;
+		memcpy(&dt1, p1, sizeof(dt1));
+		memcpy(p1, p2, sizeof(dt1));
+		memcpy(p2, &dt1, sizeof(dt1));
+		processed_sz += sizeof(dt1);
+		p1 += sizeof(dt1);
+		p2 += sizeof(dt1);
 	}
 
 	while (processed_sz + sizeof(char) <= sz) {
@@ -43,6 +72,7 @@ static int vectorized_swap(char *p1, char *p2, size_t sz) {
 enum solving_status solve_polynomial(struct polynom pol, struct polynom_roots *roots) {
 	assert (roots != NULL);
 	assert (pol.nCoeffs >= 0 && pol.nCoeffs <= MAX_COEFFICIENTS);
+	assert (is_polynom_finite(&pol));
 
 	if (pol.nCoeffs == 0) {
 		roots->nRoots = SQ_INF_ROOTS;
@@ -70,6 +100,7 @@ enum solving_status solve_polynomial(struct polynom pol, struct polynom_roots *r
 enum solving_status solve_linear(struct polynom pol, struct polynom_roots *roots) {
 	assert (roots		!= NULL);
 	assert (pol.nCoeffs	== 2);
+	assert (is_polynom_finite(&pol));
 
 	double	k = pol.coeffs[0],
 		b = pol.coeffs[1];
@@ -95,6 +126,7 @@ enum solving_status solve_linear(struct polynom pol, struct polynom_roots *roots
 enum solving_status solve_quadratic(struct polynom pol, struct polynom_roots *roots) {
 	assert (roots		!= NULL);
 	assert (pol.nCoeffs	== 3);
+	assert (is_polynom_finite(&pol));
 
 	double	a = pol.coeffs[0],
 		b = pol.coeffs[1],

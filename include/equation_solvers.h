@@ -7,6 +7,9 @@
 #ifndef EQUATIONS_H
 #define EQUATIONS_H
 
+#include <string.h>
+#include <stdint.h>
+
 static const int SQ_INF_ROOTS = -1;
 
 // static const int LINEAR_COEFFICIENTS_LEN = 2;
@@ -18,6 +21,8 @@ static const int SQ_INF_ROOTS = -1;
 #define QUADRATIC_COEFFICIENTS_LEN	(3)
 #define MAX_COEFFICIENTS		(10)
 #define MAX_ROOTS			(10)
+
+int is_finite(double n);
 
 struct polynom {
 	int nCoeffs;
