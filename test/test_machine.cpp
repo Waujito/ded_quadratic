@@ -18,7 +18,7 @@ struct tests_vector {
 	size_t tests_len	= 0;
 } tests_vector;
 
-int tests_add_entry(struct test_unit test);
+int tests_add_entry(struct test_unit *test);
 int test_runner(struct test_unit *test);
 
 int main() {

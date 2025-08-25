@@ -100,6 +100,10 @@ inline int __tm_is_eq_double(double pred, double target) {
 	return __tm_is_zero(pred - target);
 }
 
+/**
+ * Pass type qualifiers here
+ */
+
 static const char __tm_int_fmt[]	= "%d";
 static const char __tm_double_fmt[]	= "%lg";
 
@@ -131,11 +135,30 @@ static const char __tm_double_fmt[]	= "%lg";
 		__tm_assert_fail_exit();					\
 	}
 #else /* __TM_ASSERT_LOGGING_DEFINES */
-// TODO: Покумекать, 1 к 1 маппинг
-template<const char *fmt_dg, typename T>
+
+template <typename T>
+struct TypeToPrintfSpec {
+	static constexpr const char *value = NULL;
+};
+
+template <>
+struct TypeToPrintfSpec<int> {
+	static constexpr const char *value = __tm_int_fmt;
+};
+
+template <>
+struct TypeToPrintfSpec<double> {
+	static constexpr const char *value = __tm_double_fmt;
+};
+
+template<typename T>
 static void __tm_assert_fail_log(T pred, T target,
 				 const char *file_line,
 				 const char *pred_name, const char *target_name) {
+
+	static_assert(	TypeToPrintfSpec<T>::value != NULL,
+			"No valid logging function for type");
+
 	printf("\n");
 	printf(COLOR_RED);
 
@@ -143,11 +166,11 @@ static void __tm_assert_fail_log(T pred, T target,
 	printf("Assertion failed: \n");
 
 	printf("\tExpected:\t%s := ", target_name);
-	printf(fmt_dg, target);
+	printf(TypeToPrintfSpec<T>::value, target);
 	printf("\n");
 
 	printf("\tFound:\t\t%s := ", pred_name);
-	printf(fmt_dg, pred);
+	printf(TypeToPrintfSpec<T>::value, pred);
 	printf("\n");
 
 	printf(COLOR_CLEAR);
@@ -155,8 +178,8 @@ static void __tm_assert_fail_log(T pred, T target,
 
 #define __TM_EQUAL_ASSERTION(pred, target, assert_func, printf_specifier)	\
 	if (!assert_func(pred, target)) {					\
-		__tm_assert_fail_log<printf_specifier>(pred, target, 		\
-			__TM_FILE_LINE,	#pred, #target);			\
+		__tm_assert_fail_log(pred, target,				\
+					__TM_FILE_LINE,	#pred, #target);	\
 		__tm_assert_fail_exit();					\
 	}
 #endif /* __TM_ASSERT_LOGGING_DEFINES */

@@ -10,8 +10,7 @@
 
 #endif /* USE_GTEST */
 
-void polynomial_test(int nCoeffs, double coeffs[MAX_COEFFICIENTS], 
-		     int nRoots, double roots[MAX_ROOTS]);
+void polynomial_test(struct polynom pol, struct polynom_roots roots);
 
 void polynomial_test(struct polynom pol, struct polynom_roots roots) {
 	struct polynom_roots ret_roots = {0};
