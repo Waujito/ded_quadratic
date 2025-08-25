@@ -3,6 +3,7 @@
 #include "test_machine.h"
 #include <setjmp.h>
 #include <stdlib.h>
+#include <time.h>
 
 struct test_unit {
 	test_fn_t fun_ptr;
@@ -12,53 +13,20 @@ struct test_unit {
 	int line;
 };
 
+static const size_t TESTS_VECTOR_INITIAL_SZ = 4;
+
 struct tests_vector {
 	struct test_unit *tests;
 	size_t tests_capacity;
 	size_t tests_len;
 } tests_vector = {0};
 
-int tests_add_entry(struct test_unit *test);
-int test_runner(struct test_unit *test);
-
-int main() {
-	int ret = 0;
-
-	__TM_PRINT_DEBUG("In main() \n");
-
-	int passed_tests = 0;
-	int failed_tests = 0;
-
-	for (size_t i = 0; i < tests_vector.tests_len; i++) {
-		struct test_unit *test_unit = &tests_vector.tests[i];
-		ret = test_runner(test_unit);
-
-		if (ret == 0) {
-			passed_tests++;
-		} else if (ret == 1) {
-			failed_tests++;
-		} else {
-			eprintf("Internal error\n");
-			exit(EXIT_FAILURE);
-		}
-	}
-
-	printf(	"\n"
-		"passed tests: %d; failed tests: %d\n", passed_tests, failed_tests);
-
-	if (failed_tests != 0) {
-		return EXIT_FAILURE;
-	}
-
-	return EXIT_SUCCESS;
-}
-
-int tests_add_entry(struct test_unit *test) {
+static int tests_add_entry(struct test_unit *test) {
 	__TM_PRINT_DEBUG("cap %zu len %zu\n", tests_capacity, tests_len);
 	if (tests_vector.tests_len >= tests_vector.tests_capacity) {
 		size_t new_capacity = tests_vector.tests_capacity * 2;
 		if (new_capacity == 0) {
-			new_capacity = 4; // TODO const
+			new_capacity = TESTS_VECTOR_INITIAL_SZ;
 		}
 
 		struct test_unit *ntests = (struct test_unit *) realloc(
@@ -105,13 +73,24 @@ void __tm_assert_fail_exit(void) {
 	longjmp(__tm_jmp_point, 1);
 }
 
-int test_runner(struct test_unit *test) {
+static double millis_diff (struct timespec end_time, struct timespec start_time) {
+	double sec_diff = (double)(end_time.tv_sec - start_time.tv_sec);
+	double nsec_diff = (double)(end_time.tv_nsec - start_time.tv_nsec);
+	double millisec_diff = sec_diff * 1'000 + nsec_diff / 1'000'000;
+
+	return millisec_diff;
+}
+
+static int test_runner(struct test_unit *test) {
 	__TM_PRINT_DEBUG(
 		"Running test %s.%s with function ptr=%p from file %s on line %d\n",
 		test.test_group, test.test_name,
 		test.fun_ptr, test.fname, test.line);
 
 	int failed = 0;
+
+	struct timespec start_time = {0};
+	if (!timespec_get(&start_time, TIME_UTC)) return -1;
 
 	if (!setjmp(__tm_jmp_point)) {
 		test->fun_ptr();
@@ -121,23 +100,55 @@ int test_runner(struct test_unit *test) {
 	}
 	// If longjmp was not called, the program will omit failed = 1
 
-	// TODO: wrap with defines
-	if (failed) { // TODO time
-		eprintf(COLOR_RED
-			"[%s.%s][FAIL]"
-			COLOR_CLEAR
-			"\n\n",
-			test->test_group, test->test_name
-		);
+	struct timespec end_time = {0};
+	if (!timespec_get(&end_time, TIME_UTC)) return -1;
+
+	double millisec_diff = millis_diff(end_time, start_time);
+
+
+	if (failed) {
+		FPRINTF_COLORED(COLOR_RED, stderr, "[%s.%s][FAIL][in %lg ms]", 
+			test->test_group, test->test_name, millisec_diff);
+		fprintf(stderr, "\n\n");
 	} else {
-		printf(	COLOR_GREEN
-			"[%s.%s][PASS]"
-			COLOR_CLEAR "\n",
-			test->test_group, test->test_name
-		);
+		FPRINTF_COLORED(COLOR_GREEN, stdout, "[%s.%s][PASS][in %lg ms]", 
+			test->test_group, test->test_name, millisec_diff);
+		fprintf(stdout, "\n");
 	}
 
 	__TM_PRINT_DEBUG("Test finished\n\n");
 
 	return failed;
+}
+
+int main() {
+	int ret = 0;
+
+	__TM_PRINT_DEBUG("In main() \n");
+
+	int passed_tests = 0;
+	int failed_tests = 0;
+
+	for (size_t i = 0; i < tests_vector.tests_len; i++) {
+		struct test_unit *test_unit = &tests_vector.tests[i];
+		ret = test_runner(test_unit);
+
+		if (ret == 0) {
+			passed_tests++;
+		} else if (ret == 1) {
+			failed_tests++;
+		} else {
+			eprintf("Internal error\n");
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	printf(	"\n"
+		"passed tests: %d; failed tests: %d\n", passed_tests, failed_tests);
+
+	if (failed_tests != 0) {
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
 }

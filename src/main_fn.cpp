@@ -20,7 +20,7 @@ enum {
 };
 
 static struct option opts[] = {
-	{ "help",	NO_ARGUMENT,	OPT_HELP	},
+	{ "help",	OPTIONAL_ARGUMENT,	OPT_HELP	},
 	{ 0,		0,		0		},
 };
 

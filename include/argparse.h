@@ -9,7 +9,6 @@
 
 
 enum has_arg_vals {
-	NO_ARGUMENT,
 	REQUIRED_ARGUMENT,
 	OPTIONAL_ARGUMENT
 };
