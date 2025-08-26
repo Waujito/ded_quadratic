@@ -46,33 +46,44 @@ static inline int is_polynom_finite(struct polynom *pol) {
 	return 1;
 }
 
+#define ES_SWAP_BYTES(p1, p2, dtype) {		\
+	dtype dt1 = 0;				\
+	memcpy(&dt1, p1, sizeof(dt1));		\
+	memcpy(p1, p2, sizeof(dt1));		\
+	memcpy(p2, &dt1, sizeof(dt1));		\
+	p1 += sizeof(dt1);			\
+	p2 += sizeof(dt1);			\
+}
+
 static int vectorized_swap(char *p1, char *p2, size_t sz) {
 	size_t processed_sz = 0;
-// TODO switch
+
 	while (processed_sz + sizeof(uint64_t) <= sz) {
-		uint64_t dt1 = 0;
-		memcpy(&dt1, p1, sizeof(dt1));
-		memcpy(p1, p2, sizeof(dt1));
-		memcpy(p2, &dt1, sizeof(dt1));
-		processed_sz += sizeof(dt1);
-		p1 += sizeof(dt1);
-		p2 += sizeof(dt1);
+		ES_SWAP_BYTES(p1, p2, uint64_t);
+		processed_sz += sizeof(uint64_t);
+	}
+
+	if (processed_sz + sizeof(uint32_t) <= sz) {
+		ES_SWAP_BYTES(p1, p2, uint32_t);
+		processed_sz += sizeof(uint32_t);
+	}
+
+	if (processed_sz + sizeof(uint16_t) <= sz) {
+		ES_SWAP_BYTES(p1, p2, uint16_t);
+		processed_sz += sizeof(uint16_t);
 	}
 
 	while (processed_sz + sizeof(char) <= sz) {
-		char dt1 = *p1;
-		*p1 = *p2;
-		*p2 = dt1;
-		processed_sz++;
-		p1++, p2++;
+		ES_SWAP_BYTES(p1, p2, char);
+		processed_sz += sizeof(char);
 	}
 
 	return 0;
 }
 
-// Duff's device
+#undef SWAP_BYTES
 
-enum solving_status
+enum solving_status 
 solve_polynomial(struct polynom pol,
                  struct polynom_roots *roots) {
 

@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
+#include <errno.h>
 
 #include "argparse.h"
-#include "io.h"
 #include "equation_solvers.h"
 
 /*
@@ -50,6 +51,29 @@ int bbb (const char  s[])     { s++; s = "aa");
 int bbb (const char* const s) { s++; s = "aa");
 */
 
+
+/**
+ * @brief Parses coefficients from stdin
+ *
+ * Ensures the coefficients are separated by spaces or newlines.
+ *
+ * @param [in, out] pol A pointer to the polynom structure. 
+ * The structure should be filled up with nCoeffs so 
+ * this function will determine a number of coefficients to be read.
+ *
+ * @return 0 if parsed successfully, -1 in case of an error
+ */
+int read_coefficients(struct polynom *pol);
+
+/**
+ * @brief Writes found roots to stdout
+ *
+ * @param roots Polynom roots
+ *
+ * @return 0 if written successfully, -1 in case of an error
+ */
+int print_roots(struct polynom_roots roots);
+
 int main(int argc, const char *argv[]) {
 	struct polynom pol = (struct polynom){0};
 	int ret = 0;
@@ -84,4 +108,59 @@ int main(int argc, const char *argv[]) {
 	print_roots(roots);
 
 	return EXIT_SUCCESS;
+}
+
+int read_coefficients(struct polynom *pol) { // TODO several tries
+	assert (pol != NULL);
+	assert (pol->nCoeffs <= MAX_COEFFICIENTS);
+
+	int c = 0;
+
+	for (int i = 0; i < pol->nCoeffs; i++) {
+
+		int ret = scanf(" %lg", pol->coeffs + i);
+
+		if (errno) {
+			fprintf(stderr, "scanf() returned %d: %s",
+				ret, strerror (errno));
+			return -1;
+		}
+
+		if (ret != 1) {
+			return -1;
+		}
+
+		c = getchar();
+		if (c != ' ' && c != '\n') {
+			return -1;
+		}
+	}
+
+	if (c != '\n') {
+		return -1;
+	}
+
+	return 0;
+}
+
+int print_roots(struct polynom_roots roots) {
+	assert (roots.nRoots <= MAX_ROOTS);
+
+	if (roots.nRoots == SQ_INF_ROOTS) {
+		printf("The equation is valid for every rational, yoo-hoo! x\n");
+		return 0;
+	}
+
+	printf("Found a total of %d solutions of the given equation", roots.nRoots);
+
+	if (roots.nRoots != 0) {
+		printf(" : ");
+
+		for (int i = 0; i < roots.nRoots; i++) {
+			printf("%lg ", roots.roots[i]);
+		}
+	}
+	printf("\n");
+
+	return 0;
 }
