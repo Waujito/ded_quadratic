@@ -2,15 +2,16 @@ CFLAGS := -D _DEBUG -ggdb3 -O0 -Wall -Wextra -Waggressive-loop-optimizations -Wm
 
 CXXFLAGS := $(CFLAGS) -Weffc++ -Wc++14-compat -Wconditionally-supported -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo -Wstrict-null-sentinel -Wsuggest-override -Wno-literal-suffix -Wno-old-style-cast -std=c++17 -fsized-deallocation
 
-CFLAGS := $(CXXFLAGS)
 
 CXX := g++
 CC := gcc
+FLAGS := $(CXXFLAGS)
 
 LDFLAGS := -lm
 
 # Uncomment next two lines for C compiler
-# OBJCFLAGS := -xc -std=c99
+# OBJCFLAGS := -xc -std=c11
+# FLAGS := $(CFLAGS)
 # CXX := $(CC)
 
 ifdef USE_GTEST
@@ -56,17 +57,17 @@ $(OBJDIRS):
 $(CPPOBJ) $(TESTOBJ) $(LIBOBJ) $(TESTLIBOBJ): $(BUILD_DIR)/%.o: %.cpp
 	mkdir -p $(OBJDIRS)
 	# $< takes only the FIRST dependency
-	$(CXX) $(CFLAGS) $(OBJCFLAGS) -MP -MMD -c $< -o $@
+	$(CXX) $(FLAGS) $(OBJCFLAGS) -MP -MMD -c $< -o $@
 
 $(STATIC_LIB): $(LIBOBJ)
 	ar rvs $@ $^
 
 ifdef USE_GTEST
 $(TEST_LIB_APP): $(STATIC_LIB) $(TESTOBJ)
-	$(CXX) $(CFLAGS) $(LDFLAGS) $(TESTOBJ) $(STATIC_LIB) -lgtest_main -lgtest -o $(TEST_LIB_APP)
+	$(CXX) $(FLAGS) $(LDFLAGS) $(TESTOBJ) $(STATIC_LIB) -lgtest_main -lgtest -o $(TEST_LIB_APP)
 else
 $(TEST_LIB_APP): $(STATIC_LIB) $(TESTOBJ) $(TESTLIBOBJ)
-	$(CXX) $(CFLAGS) $(LDFLAGS) $(TESTOBJ) $(TESTLIBOBJ) $(STATIC_LIB) -o $(TEST_LIB_APP)
+	$(CXX) $(FLAGS) $(LDFLAGS) $(TESTOBJ) $(TESTLIBOBJ) $(STATIC_LIB) -o $(TEST_LIB_APP)
 endif
 
 
@@ -76,7 +77,7 @@ test: build_test
 	./$(TEST_LIB_APP)
 
 $(APP): $(CPPOBJ) $(STATIC_LIB)
-	$(CXX) $(CFLAGS) $(LDFLAGS) $(CPPOBJ) $(STATIC_LIB) -o $(APP)
+	$(CXX) $(FLAGS) $(LDFLAGS) $(CPPOBJ) $(STATIC_LIB) -o $(APP)
 
 document: objdirs
 	doxygen doxygen.conf
