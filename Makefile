@@ -24,7 +24,7 @@ export CXX CFLAGS
 
 BUILD_DIR := build
 
-LIBSRC := src/equation_solvers.cpp src/io.cpp src/argparse.cpp
+LIBSRC := src/equation_solvers.cpp src/argparse.cpp
 LIBOBJ := $(LIBSRC:%.cpp=$(BUILD_DIR)/%.o)
 STATIC_LIB := $(BUILD_DIR)/equations.a
 
