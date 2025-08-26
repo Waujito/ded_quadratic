@@ -4,11 +4,12 @@
  * @brief Equation solvers
  */
 
-#include "equation_solvers.h"
 #include <assert.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
+
+#include "equation_solvers.h"
 
 // static const double DOUBLE_EPS = 1e-9;
 #define DOUBLE_EPS (1e-9)
@@ -69,7 +70,12 @@ static int vectorized_swap(char *p1, char *p2, size_t sz) {
 	return 0;
 }
 
-enum solving_status solve_polynomial(struct polynom pol, struct polynom_roots *roots) {
+// Duff's device
+
+enum solving_status
+solve_polynomial(struct polynom pol,
+                 struct polynom_roots *roots) {
+
 	assert (roots != NULL);
 	assert (pol.nCoeffs >= 0 && pol.nCoeffs <= MAX_COEFFICIENTS);
 	assert (is_polynom_finite(&pol));
@@ -97,13 +103,16 @@ enum solving_status solve_polynomial(struct polynom pol, struct polynom_roots *r
 	return SOLVING_ERROR;
 }
 
+static const int LINEAR_COEFF_K = 0;
+static const int LINEAR_COEFF_B = 1;
+
 enum solving_status solve_linear(struct polynom pol, struct polynom_roots *roots) {
 	assert (roots		!= NULL);
 	assert (pol.nCoeffs	== 2);
 	assert (is_polynom_finite(&pol));
 
-	double	k = pol.coeffs[0],
-		b = pol.coeffs[1];
+	double	k = pol.coeffs[LINEAR_COEFF_K],
+		b = pol.coeffs[LINEAR_COEFF_B];
 
 	if (is_zero(k)) {
 		if (is_zero(b)) {
@@ -112,25 +121,29 @@ enum solving_status solve_linear(struct polynom pol, struct polynom_roots *roots
 			roots->nRoots = 0;
 		}
 
-		return SOLVING_SUCCESS; 
+		return SOLVING_SUCCESS;
 	}
 
 	double x = (-b) / k;
 
-	roots->nRoots = 1;
-	roots->roots[0] = x;
+	roots->nRoots	= 1;
+	roots->roots[0]	= x;
 
 	return SOLVING_SUCCESS;
 }
+
+static const int QUADRATIC_COEFF_A = 0;
+static const int QUADRATIC_COEFF_B = 1;
+static const int QUADRATIC_COEFF_C = 2;
 
 enum solving_status solve_quadratic(struct polynom pol, struct polynom_roots *roots) {
 	assert (roots		!= NULL);
 	assert (pol.nCoeffs	== 3);
 	assert (is_polynom_finite(&pol));
 
-	double	a = pol.coeffs[0],
-		b = pol.coeffs[1],
-		c = pol.coeffs[2];
+	double	a = pol.coeffs[QUADRATIC_COEFF_A],
+		b = pol.coeffs[QUADRATIC_COEFF_B],
+		c = pol.coeffs[QUADRATIC_COEFF_C];
 
 	double discriminant = 0;
 
@@ -142,8 +155,8 @@ enum solving_status solve_quadratic(struct polynom pol, struct polynom_roots *ro
 
 		return solve_linear(linear_pol, roots);
 	}
-	
-	discriminant = b * b - 4 * a * c;	
+
+	discriminant = b * b - 4 * a * c;
 
 	double x1 = 0, x2 = 0;
 
@@ -166,7 +179,7 @@ enum solving_status solve_quadratic(struct polynom pol, struct polynom_roots *ro
 			vectorized_swap((char *)&x1, (char *)&x2, sizeof(x1));
 		}
 	}
-	
+
 	roots->roots[0] = x1;
 	roots->roots[1] = x2;
 

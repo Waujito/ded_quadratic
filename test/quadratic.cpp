@@ -1,4 +1,3 @@
-#include "equation_solvers.h"
 
 #ifdef USE_GTEST
 
@@ -9,6 +8,8 @@
 #include "test_machine.h"
 
 #endif /* USE_GTEST */
+
+#include "equation_solvers.h"
 
 struct quadratic_coeffs {
 	double a;

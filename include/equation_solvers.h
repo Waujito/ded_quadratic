@@ -49,7 +49,7 @@ enum solving_status {
  *
  * Currently implemented root finders up to quadratic equation.
  *
- * @param [in] pol A polynom of \p nCoeffs coefficients 
+ * @param [in] pol A polynom of \p nCoeffs coefficients
  * @param [out] roots A pointer to polynom_roots being filled. nRoots is the number of roots found, or SQ_INF_ROOTS if the equation has infinitely many solutions
  *
  * @return enum solving_status
@@ -68,13 +68,13 @@ enum solving_status solve_linear(struct polynom pol, struct polynom_roots *roots
 
 /**
  * @brief Solves a quadratic equation \f$ ax^2 + bx + c = 0 \f$.
- * 
+ *
  * Calculates the discriminant using the formula:
  * \f[ D = b^2 - 4ac \f]
- * 
+ *
  * Then calculates the roots:
  * \f[ x_{1,2} = \frac{-b \pm \sqrt{D}}{2a} \f]
- * 
+ *
  * @param [in] pol A polynom of three coefficients \f$a\f$, \f$b\f$ and \f$c\f$
  * @param [out] roots A pointer to polynom_roots being filled. nRoots is the number of roots found, or SQ_INF_ROOTS if the equation has infinitely many solutions
  *

@@ -28,7 +28,7 @@ enum lookup_option_status {
  */
 static enum lookup_option_status lookup_for_option(
 			int argc, int *argi, 
-			char **argv, struct option *opt,
+			const char *argv[], struct option *opt,
 			struct args_context *actx) {
 	assert(argi);
 	assert(argv);
@@ -76,7 +76,7 @@ static enum lookup_option_status lookup_for_option(
 	return LOOKUP_FOUND;
 }
 
-int parse_args(int argc, char **argv, 
+int parse_args(int argc, const char *argv[], 
 	       struct option opts[],
 	       args_callback callback, void *context) {
 	assert(argv);

@@ -75,7 +75,7 @@ typedef int (*args_callback)(struct args_context ctx);
  * @return 0 if all arguments parsed successfully, or negative index of failed argument if the error happened. Negative index of argument is ok because parse_args does not parse the first (i = 0) argument which is typically a command name.
  *
  */
-int parse_args(int argc, char **argv, 
+int parse_args(int argc, const char *argv[],
 	       struct option opts[],
 	       args_callback callback, void *context);
 

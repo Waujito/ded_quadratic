@@ -44,9 +44,20 @@ incpd := $(INCPDSRC:%.cpp=$(BUILD_DIR)/%.d)
 
 OBJDIRS := $(sort $(dir $(LIBOBJ) $(TESTOBJ) $(CPPOBJ) $(TESTLIBOBJ)))
 
+define INCFIRE
+	@echo IN CASE OF FIRE
+	@echo GIT COMMIT
+	@echo GIT PUSH
+	@echo MEOW
+	@echo LEAVE BUILDING
+	@echo THE TARGET IS BUILT SUCCSESSFULLY
+	@echo
+endef
+
 .PHONY: build clean run test document build_test objdirs
 
 build: $(APP)
+	$(INCFIRE)
 
 run: build
 	./$(APP)
@@ -72,6 +83,7 @@ endif
 
 
 build_test: $(TEST_LIB_APP)
+	$(INCFIRE)
 
 test: build_test
 	./$(TEST_LIB_APP)

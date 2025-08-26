@@ -4,11 +4,12 @@
  * @brief IO functions for polynom coefficients
  */
 
-#include "io.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+
+#include "io.h"
 
 int read_coefficients(struct polynom *pol) { // TODO several tries
 	assert (pol != NULL);
@@ -17,9 +18,12 @@ int read_coefficients(struct polynom *pol) { // TODO several tries
 	int c = 0;
 
 	for (int i = 0; i < pol->nCoeffs; i++) {
-		int ret = scanf("%lg", pol->coeffs + i);
+
+		int ret = scanf(" %lg", pol->coeffs + i);
+
 		if (errno) {
-			perror("scanf() failed");
+			fprintf(stderr, "scanf() returned %d: %s",
+				ret, strerror (errno));
 			return -1;
 		}
 
@@ -44,7 +48,7 @@ int print_roots(struct polynom_roots roots) {
 	assert (roots.nRoots <= MAX_ROOTS);
 
 	if (roots.nRoots == SQ_INF_ROOTS) {
-		printf("The equation is valid for every rational x\n");
+		printf("The equation is valid for every rational, yoo-hoo! x\n");
 		return 0;
 	}
 

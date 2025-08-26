@@ -30,35 +30,35 @@ void polynomial_test(struct polynom pol, struct polynom_roots roots) {
 	}
 }
 
-TEST(PolynomialTest, OneCoeffEqInfRoots) { 
+TEST(PolynomialTest, OneCoeffEqInfRoots) {
 	polynomial_test(
-		(struct polynom) { .nCoeffs = 1, .coeffs = {0} },
+		(struct polynom)       { .nCoeffs = 1, .coeffs = {0} },
 		(struct polynom_roots) { .nRoots = SQ_INF_ROOTS, .roots = {NAN} }
 	);
 }
 
-TEST(PolynomialTest, OneCoeffEqNoRoots) { 
+TEST(PolynomialTest, OneCoeffEqNoRoots) {
 	polynomial_test(
 		(struct polynom) { .nCoeffs = 1, .coeffs = {1} },
 		(struct polynom_roots) { .nRoots = 0, .roots = {NAN} }
 	);
 }
 
-TEST(PolynomialTest, NormalLinearEq) { 
+TEST(PolynomialTest, NormalLinearEq) {
 	polynomial_test(
 		(struct polynom) { .nCoeffs = 2, .coeffs = {1, 2} },
 		(struct polynom_roots) { .nRoots = 1, .roots = {-2} }
 	);
 }
 
-TEST(PolynomialTest, NormalQuadraticEq) { 
+TEST(PolynomialTest, NormalQuadraticEq) {
 	polynomial_test(
 		(struct polynom) { .nCoeffs = 3, .coeffs = {1, -5, 6} },
 		(struct polynom_roots) { .nRoots = 2, .roots = {2, 3} }
 	);
 }
 
-TEST(PolynomialTest, NotImplementedEq) { 
+TEST(PolynomialTest, NotImplementedEq) {
 	struct polynom pol =  { .nCoeffs = 4, .coeffs = {0} };
 	struct polynom_roots roots;
 

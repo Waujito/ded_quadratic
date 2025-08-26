@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <assert.h>
-#include "test_machine.h"
 #include <setjmp.h>
 #include <stdlib.h>
 #include <time.h>
+
+#include "test_machine.h"
 
 struct test_unit {
 	test_fn_t fun_ptr;

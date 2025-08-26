@@ -9,12 +9,15 @@
 
 #include <math.h>
 #include <stdio.h>
+
 #include "colors.h"
 
 #ifdef TM_T_TEST_DEBUG
-#define TM_T_PRINT_DEBUG(...) printf(__VA_ARGS__)
+	#define TM_T_PRINT_DEBUG(...) printf(__VA_ARGS__)
+
 #else /* TM_T_TEST_DEBUG */
-#define TM_T_PRINT_DEBUG(...) (void)0
+	#define TM_T_PRINT_DEBUG(...) (void)0
+
 #endif /* TM_T_TEST_DEBUG */
 
 #define eprintf(...) fprintf(stderr, __VA_ARGS__)
@@ -85,9 +88,9 @@ static void tm_t__##test_group##_##test_name##_constructor() {	\
 
 void tm_t_assert_fail_exit(void) __attribute__ ((__noreturn__));
 
-#define STRINGIZING(x) #x
-#define STR(x) STRINGIZING(x)
-#define TM_T_FILE_LINE __FILE__ ":" STR(__LINE__)
+#define STRINGIZING(x)	#x
+#define STR(x)		STRINGIZING(x)
+#define TM_T_FILE_LINE	__FILE__ ":" STR(__LINE__)
 
 // static const double TM_T_DOUBLE_EPS = 1e-9;
 #define TM_T_DOUBLE_EPS (1e-9)
@@ -122,7 +125,7 @@ static const char tm_t_double_fmt[]	= "%lg";
 
 #ifdef TM_T_ASSERT_LOGGING_DEFINES
 #define TM_T_ASSERTION_FAILURE_OPEN(file_line)		\
-	eprintf(COLOR_RED "In %s \n", file_line);			\
+	eprintf(COLOR_RED "In %s \n", file_line);	\
 	eprintf("Assertion failed: \n");		\
 
 #define TM_T_ASSERTION_FAILURE_CLOSE			\

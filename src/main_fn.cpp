@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "argparse.h"
 #include "io.h"
 #include "equation_solvers.h"
@@ -9,7 +10,7 @@
 	   |\---/|
 	   | ,_, |
 	    \_`_/-..----.
-	 ___/ `   ' ,""+ \  
+	 ___/ `   ' ,""+ \
 	(__...'   __\    |`.___.';
 	  (_,...'(_,.`__)/'.....+
 
@@ -37,13 +38,25 @@ int arg_callback(struct args_context ctx) {
 	return 0;
 }
 
-int main(int argc, char **argv) {
+/*
+int aaa (char* s)             { s++; s = "aa");
+
+int bbb (char  s[])           { s++; s = "aa");
+int bbb (char* const  s)      { s++; s = "aa");
+
+int aaa (const char* s)       { s++; s = "aa");
+
+int bbb (const char  s[])     { s++; s = "aa");
+int bbb (const char* const s) { s++; s = "aa");
+*/
+
+int main(int argc, const char *argv[]) {
 	struct polynom pol = (struct polynom){0};
 	int ret = 0;
 
 	ret = parse_args(argc, argv, opts, arg_callback, NULL);
 	if (ret) {
-		printf("What the error ^_^ %d\n", ret);
+		printf("What the f... error ^_^ %d\n", ret);
 		return EXIT_FAILURE;
 	}
 	printf("\n");
@@ -61,7 +74,7 @@ int main(int argc, char **argv) {
 	}
 
 	struct polynom_roots roots;
-	ret = solve_polynomial(pol, &roots);	
+	ret = solve_polynomial(pol, &roots);
 	if (ret) {
 		fprintf(stderr, "Something went wrong while solving an equation: "
 				"A solver exited with exit code %d\n", ret);
@@ -69,6 +82,6 @@ int main(int argc, char **argv) {
 	}
 
 	print_roots(roots);
-	
+
 	return EXIT_SUCCESS;
 }
