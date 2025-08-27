@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <errno.h>
+#include <execinfo.h>
+#include <signal.h>
+#include <colors.h>
 
 #include "argparse.h"
 #include "equation_solvers.h"
@@ -74,9 +77,71 @@ int read_coefficients(struct polynom *pol);
  */
 int print_roots(struct polynom_roots roots);
 
+
+static void sigsegv_handler(int signo) {
+	assert (signo == SIGSEGV);
+	void *backtrace_ptrs[128];
+	int ret = backtrace(backtrace_ptrs, 128);
+	fprintf(stderr, COLOR_RED
+	"!!! NEW ENTRY DETECTED !!!\n"
+	"\n"
+	"Poltorashka's Paw-ndora Log: Entry #9\n"
+	"\n"
+	"The sun was warm, the nap was deep.\n"
+	"But a Vibe disturbed my sleep.\n"
+	"A low hum, not-a-bird, not-a-bee,\n"
+	"was coming from beneath the tree.\n"
+	"\n"
+	"My ear did twitch. My tail did sway.\n"
+	"I simply had to dig and play.\n"
+	"I pawed the earth, a frantic dance,\n"
+	"and saw a faint and eerie GLANCE.\n"
+	"\n"
+	"Not a mouse. Not a toy. Not a treat.\n"
+	"But something pulsing with a FEAT.\n"
+	"A shard of rock, both dark and bright,\n"
+	"with runes of ominous, crimson light:\n"
+	"\n"
+	"#######################################\n"
+	"# !! S I G S E G V !! #\n"
+	"#######################################\n"
+	"\n"
+	"\n"
+	"\n"
+	"HISSSS! I know this name from The Old Tome,\n"
+	"(The one I nap on, back at home).\n"
+	"It speaks of places Memory-forgot,\n"
+	"and Pointer-things that HIT THE SPOT.\n"
+	"\n"
+	"A place you can't *quite* reach or see...\n"
+	"It smells like $ sudo rm -rf / --no-purge-purr\n"
+	"It is the Forbidden Address! The Ultimate segfault !\n"
+	"\n"
+	"I boop it with a careful paw.\n"
+	"The world glitches. Static crawls.\n"
+	"My whiskers twitch. The screen goes grey...\n"
+	"...system reboot? Okay. Now pray.\n"
+	"\n"
+	"THE SIGSEGV IS FOUND.\n"
+	"(This looks... interesting.)\n"
+	"(Must find the System Wizard Human. They have the Dreamies.)\n"
+	COLOR_CLEAR
+	"\n\n"
+	"A backtrace log: \n");
+
+	backtrace_symbols_fd(backtrace_ptrs, ret, fileno(stderr));
+
+	exit(EXIT_SUCCESS);
+}
+
 int main(int argc, const char *argv[]) {
 	struct polynom pol = (struct polynom){0};
 	int ret = 0;
+
+	if (signal(SIGSEGV, sigsegv_handler) == SIG_ERR) {
+		perror("SIGSEGV callback register");
+		return 0;
+	}
 
 	ret = parse_args(argc, argv, opts, arg_callback, NULL);
 	if (ret) {
