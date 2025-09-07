@@ -50,8 +50,8 @@ int gdb_running(pid_t program_pid, int signaling_fd) {
 		if (close(pipefd[1]) == -1)
 			err(EXIT_FAILURE, "close");
 
-		if (dup2(STDOUT_FILENO, STDERR_FILENO) == -1)
-			err(EXIT_FAILURE, "dup2");
+		// if (dup2(STDOUT_FILENO, STDERR_FILENO) == -1)
+		// 	err(EXIT_FAILURE, "dup2");
 
 		if (close(pipefd_in[1]) == -1)
 			err(EXIT_FAILURE, "close");
@@ -94,6 +94,7 @@ int gdb_running(pid_t program_pid, int signaling_fd) {
 		const char *GDB_INFO_LOCALS = "info locals\n";
 		const char *GDB_INFO_LOCALS_OUT = "&\"info locals\\n\"";
 		const size_t GDB_INFO_LOCALS_OUT_LEN = strlen(GDB_INFO_LOCALS);
+		const char *GDB_CONSOLE_INTERPRETER = "new-ui console /dev/tty\n";
 
 		const char *GDB_DONE_OUT = "^done";
 		const size_t GDB_DONE_OUT_LEN = strlen(GDB_DONE_OUT);
@@ -137,7 +138,6 @@ int gdb_running(pid_t program_pid, int signaling_fd) {
 							break;
 						case 'g':
 							print_gdb = 1;
-							printf("(gdb)\n");
 							break;
 						case 'e':
 						default:
@@ -149,7 +149,6 @@ int gdb_running(pid_t program_pid, int signaling_fd) {
 					}
 
 					if (print_gdb) {
-						dup2(pipefd_in[1], STDIN_FILENO);
 						break;
 					}
 
@@ -170,9 +169,8 @@ int gdb_running(pid_t program_pid, int signaling_fd) {
 		}
 
 		if (print_gdb) {
-			while ((getline_readlen = getline(&lineptr, &line_cap, pipe_stream)) != -1) {
-				printf("%s", lineptr);
-			}
+			printf("Redirecting tty to gdb in console variant...\n");
+			write(pipefd_in[1], GDB_CONSOLE_INTERPRETER, strlen(GDB_CONSOLE_INTERPRETER));
 		}
 
 		if (fclose(pipe_stream) == EOF)
